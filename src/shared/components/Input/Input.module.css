@@ -1,0 +1,10 @@
+.input {
+  width: 268px;
+  height: 38px;
+  padding: 11px 11px 11px 8px;
+  border: 1px solid #dbdbdb;
+  background-color: #fafafa;
+  border-radius: 3px;
+  font-size: 12px;
+  line-height: 36px;
+}
