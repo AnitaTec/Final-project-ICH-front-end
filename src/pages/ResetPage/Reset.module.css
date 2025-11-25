@@ -1,0 +1,121 @@
+.containerWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.container {
+  border: 1px solid #dbdbdb;
+  width: 390px;
+  height: 537px;
+  padding: 25px 45px 0 45px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.container img {
+  width: 80px;
+  margin-bottom: 14px;
+}
+
+.title {
+  font-size: 17px;
+  font-weight: 600;
+  color: #262626;
+  margin-bottom: 14px;
+}
+
+.subtext {
+  font-size: 14px;
+  color: #737373;
+  font-weight: 400;
+  margin-bottom: 16px;
+  line-height: 18px;
+}
+
+.container form {
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  width: 100%;
+}
+
+.form input {
+  margin-bottom: 16px;
+  border-radius: 6px;
+}
+
+::placeholder {
+  font-size: 14px;
+  color: #c7c7c7;
+  line-height: 18px;
+}
+
+.orWrapper {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 15px;
+  gap: 17px;
+}
+
+.line {
+  flex: 1;
+  height: 1px;
+  background: #dbdbdb;
+}
+
+.orWrapper p {
+  margin: 0;
+  font-size: 12px;
+  color: #737373;
+}
+
+.createAccount {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.createAccount a {
+  color: #262626;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.resetButton {
+  width: 300px;
+  height: 32px;
+  font-size: 14px;
+  background: #0095f6;
+  border: none;
+  color: white;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  align-self: center;
+  margin-bottom: 60px;
+}
+
+.backToLogin {
+  width: 388px;
+  height: 44px;
+  background-color: #fafafa;
+  border: 1px solid #dbdbdb;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: auto;
+}
+
+.backToLogin a {
+  color: #262626;
+  font-size: 14px;
+  line-height: 18px;
+  font-weight: 600;
+  text-decoration: none;
+}
