@@ -1,0 +1,43 @@
+.menu {
+  width: 245px;
+  height: 100vh;
+  padding: 28px 12px 0 12px;
+  display: flex;
+  border-right: 1px solid #dbdbdb;
+  flex-direction: column;
+}
+
+.LogoImg {
+  width: 97px;
+  height: 54px;
+  margin-bottom: 21px;
+}
+
+.list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0;
+}
+
+.list img {
+  width: 24px;
+  height: 24px;
+}
+
+.menu li {
+  width: 129px;
+  height: 29px;
+}
+
+.menu a {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  text-decoration: none;
+  color: #000000;
+  font-size: 16px;
+  line-height: 20px;
+  font-weight: 400;
+}

@@ -1,0 +1,41 @@
+.page {
+  display: flex;
+  flex-direction: column;
+}
+.contentWrapper {
+  display: flex;
+  flex: 1;
+}
+
+.main {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.update {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+.update img {
+  margin-bottom: 10px;
+}
+
+.title {
+  color: #000000;
+  font-size: 17px;
+  line-height: 21px;
+  font-weight: 400;
+  margin-bottom: 4px;
+}
+
+.info {
+  color: #737373;
+  font-size: 12px;
+  line-height: 15px;
+  font-weight: 400;
+}

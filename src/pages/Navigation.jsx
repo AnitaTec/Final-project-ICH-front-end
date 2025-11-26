@@ -11,7 +11,7 @@ const Navigation = () => {
   return (
     <Routes>
       <Route path="/" element={<LoginPage />} />
-      {/* <Route path="/login" element={<HomePage />} /> */}
+      <Route path="/home" element={<HomePage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/signupError" element={<ResetPage />} />
       <Route path="/profile" element={<MyProfilePage />} />
