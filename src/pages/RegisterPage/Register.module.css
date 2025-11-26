@@ -29,10 +29,20 @@
   z-index: 0;
 }
 
-.container form {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+.info {
+  font-size: 16px;
+  line-height: 20px;
+  margin-bottom: 36px;
+}
+
+.terms {
+  margin-top: 26px;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.cookies {
+  margin-top: 18px;
 }
 
 .loginPage {
@@ -51,11 +61,6 @@
   text-decoration: none;
 }
 
-::placeholder {
-  font-size: 12px;
-  color: #737373;
-}
-
 .container p {
   text-align: center;
   color: #737373;
@@ -66,18 +71,7 @@
   color: #00376b;
 }
 
-.info {
-  font-size: 16px;
-  line-height: 20px;
-  margin-bottom: 36px;
-}
-
-.terms {
-  margin-top: 26px;
+::placeholder {
   font-size: 12px;
-  line-height: 16px;
-}
-
-.cookies {
-  margin-top: 18px;
+  color: #737373;
 }

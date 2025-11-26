@@ -1,0 +1,48 @@
+.form {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.form input:first-child {
+  margin-bottom: 6px;
+}
+
+.or {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin: 22px 0 70px 0;
+  color: #737373;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.or::before,
+.or::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #dbdbdb;
+}
+
+.or::before {
+  margin-right: 15px;
+}
+
+.or::after {
+  margin-left: 15px;
+}
+
+.forgot {
+  text-align: center;
+  display: block;
+  color: #00376b;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.error {
+  color: red;
+  font-size: 12px;
+}
