@@ -2,6 +2,7 @@
   display: flex;
   flex-direction: column;
 }
+
 .contentWrapper {
   display: flex;
   flex: 1;
@@ -10,18 +11,31 @@
 .main {
   flex: 1;
   display: flex;
-  justify-content: center;
-  align-items: center;
   flex-direction: column;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, max-content);
+  column-gap: 40px;
+  row-gap: 23px;
+  margin-left: 77px;
+  margin-top: 58px;
 }
 
 .update {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  flex-direction: column;
+  width: 404px;
+  height: 217px;
+  margin-left: 301px;
 }
+
 .update img {
+  width: 83px;
+  height: 83px;
   margin-bottom: 10px;
 }
 
@@ -38,4 +52,11 @@
   font-size: 12px;
   line-height: 15px;
   font-weight: 400;
+}
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: 1fr;
+    margin-left: 30px;
+  }
 }

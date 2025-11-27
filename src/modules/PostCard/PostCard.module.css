@@ -1,0 +1,108 @@
+.card {
+  max-width: 404px;
+  height: 717px;
+  border-bottom: 1px solid #dbdbdb;
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  align-items: start;
+  padding: 0 0 12px 0;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.userInfo {
+  display: flex;
+
+  gap: 6px;
+
+  margin-left: 10px;
+}
+
+.username {
+  color: #000000;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 15px;
+}
+
+.time {
+  color: #737373;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 15px;
+}
+
+.follow {
+  color: #0095f6;
+  background: none;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 15px;
+  margin-left: 15px;
+}
+
+.mainImg {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 12px;
+}
+
+.actions button {
+  background: none;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.left {
+  display: flex;
+  gap: 12px;
+}
+
+.likes {
+  padding: 0 12px;
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+.caption {
+  padding: 6px 12px;
+}
+
+.bold {
+  font-weight: 600;
+}
+
+.comments {
+  padding: 0 12px 12px 12px;
+  color: #737373;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.iconBtn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.iconBtn img {
+  width: 24px;
+  height: 24px;
+}

@@ -1,6 +1,6 @@
 import styles from "./Menu.module.css";
 import { Link } from "react-router-dom";
-import IchImg from "../../assets/icons/ICHGRA.svg";
+import IchImg from "../../assets/icons/ICHgram.svg";
 import HomeImg from "../../assets/icons/Home.svg";
 import ExploreImg from "../../assets/icons/Explore.svg";
 import CreateImg from "../../assets/icons/Create.svg";
