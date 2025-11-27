@@ -1,0 +1,17 @@
+.page {
+  display: flex;
+  flex-direction: column;
+}
+
+.mainRow {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+}
+
+.contentWrapper {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

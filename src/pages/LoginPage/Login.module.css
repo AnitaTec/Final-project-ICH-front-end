@@ -45,3 +45,9 @@
   color: #0095f6;
   text-decoration: none;
 }
+
+@media (max-width: 600px) {
+  .image {
+    display: none;
+  }
+}

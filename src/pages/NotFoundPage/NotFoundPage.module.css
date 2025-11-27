@@ -1,0 +1,86 @@
+.page {
+  display: flex;
+  flex-direction: column;
+}
+
+.mainRow {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+}
+
+.contentWrapper {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 94px;
+  margin-bottom: 185px;
+}
+
+.contentRow {
+  display: flex;
+  gap: 43px;
+}
+
+.textBlock {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.title {
+  color: #000;
+  font-size: 36px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  margin-top: 47px;
+}
+
+.description {
+  font-size: 16px;
+  color: #737373;
+  max-width: 475px;
+  font-weight: 600;
+}
+
+@media (max-width: 1200px) {
+  .contentRow {
+    gap: 40px;
+  }
+}
+
+@media (max-width: 900px) {
+  .contentRow {
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+  }
+
+  .textBlock {
+    text-align: center;
+  }
+
+  .title {
+    margin-top: 20px;
+  }
+}
+
+@media (max-width: 600px) {
+  .contentWrapper {
+    padding: 0 20px;
+  }
+
+  .title {
+    font-size: 28px;
+  }
+
+  .description {
+    font-size: 14px;
+  }
+
+  .contentRow img {
+    width: 80%;
+    height: auto;
+  }
+}

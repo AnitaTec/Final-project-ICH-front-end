@@ -46,3 +46,69 @@
   color: red;
   font-size: 12px;
 }
+
+@media (max-width: 900px) {
+  .form {
+    width: 100%;
+    padding: 0 20px;
+  }
+
+  .or {
+    margin: 18px 0 50px 0;
+  }
+
+  .forgot {
+    font-size: 13px;
+  }
+
+  .error {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 600px) {
+  .form {
+    width: 100%;
+    padding: 0 15px;
+  }
+
+  .form input {
+    height: 38px;
+    font-size: 14px;
+  }
+
+  .or {
+    margin: 16px 0 40px 0;
+    font-size: 12px;
+  }
+
+  .forgot {
+    font-size: 13px;
+    margin-top: -20px;
+  }
+
+  .error {
+    font-size: 11px;
+    text-align: center;
+    max-width: 260px;
+  }
+}
+
+@media (max-width: 400px) {
+  .form {
+    padding: 0 10px;
+  }
+
+  .form input {
+    font-size: 13px;
+  }
+
+  .or {
+    margin: 14px 0 32px 0;
+    font-size: 11px;
+  }
+
+  .forgot {
+    font-size: 12px;
+  }
+}
