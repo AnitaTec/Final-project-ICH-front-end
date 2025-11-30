@@ -1,5 +1,7 @@
+import { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import styles from "./Menu.module.css";
-import { Link } from "react-router-dom";
+
 import IchImg from "../../assets/icons/ICHgram.svg";
 import HomeImg from "../../assets/icons/Home.svg";
 import ExploreImg from "../../assets/icons/Explore.svg";
@@ -8,7 +10,49 @@ import MessagesImg from "../../assets/icons/Messages.svg";
 import NotificationsImg from "../../assets/icons/Notifications.svg";
 import SearchImg from "../../assets/icons/Search.svg";
 
+import HomeAct from "../../assets/icons/homeActive.svg";
+import ExplAct from "../../assets/icons/exploreActive.svg";
+import NotificAct from "../../assets/icons/notificationsActive.svg";
+import SearchAct from "../../assets/icons/searchActive.svg";
+import MessageAct from "../../assets/icons/messageActive.svg";
+
+import NotificationsPopup from "../../modules/Notifications/NotificationsPopup.jsx";
+import SearchPopup from "../../modules/Search/SearchPopup.jsx";
+
 const Menu = () => {
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
+  const location = useLocation();
+
+  const getIcon = (type) => {
+    switch (type) {
+      case "home":
+        return !showSearch &&
+          !showNotifications &&
+          location.pathname === "/home"
+          ? HomeAct
+          : HomeImg;
+      case "explore":
+        return !showSearch &&
+          !showNotifications &&
+          location.pathname === "/explore"
+          ? ExplAct
+          : ExploreImg;
+      case "search":
+        return showSearch ? SearchAct : SearchImg;
+      case "messages":
+        return !showSearch &&
+          !showNotifications &&
+          location.pathname === "/messages"
+          ? MessageAct
+          : MessagesImg;
+      case "notifications":
+        return showNotifications ? NotificAct : NotificationsImg;
+      default:
+        return "";
+    }
+  };
+
   return (
     <nav className={styles.menu}>
       <img className={styles.LogoImg} src={IchImg} alt="IchImg" />
@@ -16,37 +60,52 @@ const Menu = () => {
       <ul className={styles.list}>
         <li>
           <Link to="/home">
-            <img src={HomeImg} alt="Home" />
+            <img src={getIcon("home")} alt="Home" />
             Home
           </Link>
         </li>
-
         <li>
-          <Link to="/search">
-            <img src={SearchImg} alt="Search" />
+          <div
+            className={styles.popUp}
+            onClick={() => {
+              setShowSearch(!showSearch);
+              setShowNotifications(false);
+            }}
+          >
+            <img src={getIcon("search")} alt="Search" />
             Search
-          </Link>
+            {showSearch && <SearchPopup onClose={() => setShowSearch(false)} />}
+          </div>
         </li>
 
         <li>
           <Link to="/explore">
-            <img src={ExploreImg} alt="Explore" />
+            <img src={getIcon("explore")} alt="Explore" />
             Explore
           </Link>
         </li>
 
         <li>
           <Link to="/messages">
-            <img src={MessagesImg} alt="Messages" />
+            <img src={getIcon("messages")} alt="Messages" />
             Messages
           </Link>
         </li>
 
         <li>
-          <Link to="/notifications">
-            <img src={NotificationsImg} alt="Notifications" />
+          <div
+            className={styles.popUp}
+            onClick={() => {
+              setShowNotifications(!showNotifications);
+              setShowSearch(false);
+            }}
+          >
+            <img src={getIcon("notifications")} alt="Notifications" />
             Notifications
-          </Link>
+            {showNotifications && (
+              <NotificationsPopup onClose={() => setShowNotifications(false)} />
+            )}
+          </div>
         </li>
 
         <li>

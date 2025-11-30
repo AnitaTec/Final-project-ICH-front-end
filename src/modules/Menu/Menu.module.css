@@ -16,8 +16,7 @@
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 0;
+  gap: 17px;
 }
 
 .list img {
@@ -25,12 +24,9 @@
   height: 24px;
 }
 
-.menu li {
-  width: 129px;
-  height: 29px;
-}
-
-.menu a {
+.menu a,
+.popUp {
+  cursor: pointer;
   display: flex;
   align-items: center;
   gap: 16px;
@@ -41,6 +37,7 @@
   font-weight: 400;
 }
 
+/* mobile */
 @media (max-width: 900px) {
   .menu {
     width: 80px;

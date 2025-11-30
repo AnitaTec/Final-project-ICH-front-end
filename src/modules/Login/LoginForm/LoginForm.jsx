@@ -11,17 +11,17 @@ const LoginForm = () => {
 
   const validate = () => {
     const newErrors = { username: "", password: "" };
-    const usernameRegex = /^[A-Za-z0-9]{6,}$/;
+    const usernameRegex = /^[A-Za-z0-9]{1,}$/;
     const specialCharRegex = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/;
 
     if (!usernameRegex.test(username)) {
       newErrors.username =
-        "Username must be at least 6 characters and contain only letters or numbers.";
+        "Username must be at least 8 characters and contain only letters or numbers.";
     }
 
-    if (password.length < 6 || !specialCharRegex.test(password)) {
+    if (password.length < 8 || !specialCharRegex.test(password)) {
       newErrors.password =
-        "Password must be at least 6 characters and contain at least one special character.";
+        "Password must be at least 8 characters and contain at least one special character.";
     }
 
     setErrors(newErrors);
