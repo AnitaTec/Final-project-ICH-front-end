@@ -7,7 +7,7 @@ const NotificationsPopup = ({ onClose }) => {
     <div className={styles.wrapper}>
       <div className={styles.overlay} onClick={onClose}></div>
 
-      <div className={styles.popup}>
+      <div className={styles.popup} onClick={(e) => e.stopPropagation()}>
         <h4>Notifications</h4>
         <p>New</p>
 

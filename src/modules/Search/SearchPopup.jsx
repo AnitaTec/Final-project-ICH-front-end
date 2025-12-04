@@ -6,7 +6,7 @@ const SearchPopup = ({ onClose }) => {
     <div className={styles.wrapper}>
       <div className={styles.overlay} onClick={onClose}></div>
 
-      <div className={styles.popup}>
+      <div className={styles.popup} onClick={(e) => e.stopPropagation()}>
         <h4>Search</h4>
 
         <input type="text" className={styles.input} placeholder="Search" />
