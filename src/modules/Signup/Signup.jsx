@@ -1,25 +1,28 @@
 import { useSelector, useDispatch } from "react-redux";
-
+import { Navigate } from "react-router-dom";
 import SignupForm from "./SignupForm/SignupForm.jsx";
-
+import { selectAuthRequest } from "../../store/auth/authSelectors.js";
 import { registerUser } from "../../store/auth/authSlice.js";
 
 const Signup = () => {
-  const { error, loading } = useSelector((store) => {
-    return {
-      loading: store.auth.loading,
-      error: store.auth.error,
-    };
-  });
+  const { error, loading, isRegisterSuccess } = useSelector(selectAuthRequest);
+
   const dispatch = useDispatch();
   const onRegister = async (payload) => {
     dispatch(registerUser(payload));
   };
+
+  if (isRegisterSuccess) return <Navigate to="/" />;
+
   return (
     <div>
-      <SignupForm submitForm={onRegister} />
+      <SignupForm
+        requestErrors={error}
+        isSubmitSucces={isRegisterSuccess}
+        submitForm={onRegister}
+      />
+
       {loading && <p>Register request .....</p>}
-      {error && <p style={{ color: "red" }}>Error: {error}</p>}
     </div>
   );
 };

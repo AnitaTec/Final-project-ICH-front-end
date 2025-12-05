@@ -8,3 +8,14 @@
   font-size: 12px;
   line-height: 36px;
 }
+
+.errorMessage {
+  color: red !important;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.inputWrapper {
+  display: flex;
+  flex-direction: column;
+}
