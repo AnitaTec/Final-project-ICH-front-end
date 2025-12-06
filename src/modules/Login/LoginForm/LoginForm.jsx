@@ -1,58 +1,58 @@
-import { useState } from "react";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
 import Input from "../../../shared/components/Input/Input";
 import Button from "../../../shared/components/Button/Button";
 import { Link } from "react-router-dom";
 import styles from "./LoginForm.module.css";
 
-const LoginForm = () => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [errors, setErrors] = useState({ username: "", password: "" });
+const LoginForm = ({ submitForm, isSubmitSucces, requestErrors }) => {
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setError,
+    formState: { errors },
+  } = useForm();
 
-  const validate = () => {
-    const newErrors = { username: "", password: "" };
-    const usernameRegex = /^[A-Za-z0-9]{1,}$/;
-    const specialCharRegex = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/;
-
-    if (!usernameRegex.test(username)) {
-      newErrors.username =
-        "Username must be at least 8 characters and contain only letters or numbers.";
+  useEffect(() => {
+    if (requestErrors) {
+      for (const key in requestErrors) {
+        if (requestErrors[key]) {
+          setError(key, {
+            type: "server",
+            message: requestErrors[key],
+          });
+        }
+      }
     }
+  }, [requestErrors, setError]);
 
-    if (password.length < 8 || !specialCharRegex.test(password)) {
-      newErrors.password =
-        "Password must be at least 8 characters and contain at least one special character.";
+  useEffect(() => {
+    if (isSubmitSucces) {
+      reset();
     }
+  }, [isSubmitSucces, reset]);
 
-    setErrors(newErrors);
-    return !newErrors.username && !newErrors.password;
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (validate()) {
-      console.log("Form submitted:", { username, password });
-    }
+  const onSubmit = (values) => {
+    submitForm(values);
   };
 
   return (
     <>
-      <form className={styles.form} onSubmit={handleSubmit}>
+      <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
         <Input
           type="text"
           placeholder="Username, or email"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          {...register("identifier", { required: "Identifier is required" })}
+          error={errors.identifier}
         />
-        {errors.username && <p className={styles.error}>{errors.username}</p>}
 
         <Input
           type="password"
           placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          {...register("password", { required: "Password is required" })}
+          error={errors.password}
         />
-        {errors.password && <p className={styles.error}>{errors.password}</p>}
 
         <Button type="submit">Log In</Button>
       </form>

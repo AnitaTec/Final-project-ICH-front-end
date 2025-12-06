@@ -16,12 +16,15 @@ import NotificAct from "../../assets/icons/notificationsActive.svg";
 import SearchAct from "../../assets/icons/searchActive.svg";
 import MessageAct from "../../assets/icons/messageActive.svg";
 
+import CreatePopup from "../../modules/Create/CreatePopup.jsx";
 import NotificationsPopup from "../../modules/Notifications/NotificationsPopup.jsx";
 import SearchPopup from "../../modules/Search/SearchPopup.jsx";
 
 const Menu = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
+  const [showCreate, setShowCreate] = useState(false);
+
   const location = useLocation();
 
   const getIcon = (type) => {
@@ -64,6 +67,7 @@ const Menu = () => {
             Home
           </Link>
         </li>
+
         <li>
           <div
             className={styles.popUp}
@@ -108,11 +112,20 @@ const Menu = () => {
           </div>
         </li>
 
+        {/* ✅ Исправленный CREATE — popup, без перехода на новую страницу */}
         <li>
-          <Link to="/create">
+          <div
+            className={styles.popUp}
+            onClick={() => {
+              setShowCreate(true);
+              setShowNotifications(false);
+              setShowSearch(false);
+            }}
+          >
             <img src={CreateImg} alt="Create" />
             Create
-          </Link>
+            {showCreate && <CreatePopup onClose={() => setShowCreate(false)} />}
+          </div>
         </li>
       </ul>
     </nav>

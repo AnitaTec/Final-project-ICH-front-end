@@ -18,3 +18,21 @@ export const registerUser = createAsyncThunk(
     }
   }
 );
+
+export const loginUser = createAsyncThunk(
+  "login",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const data = await authApi.login(payload);
+      return data;
+    } catch (error) {
+      const msg = error?.response?.data?.message || error?.message;
+
+      return rejectWithValue({
+        email: msg.includes("Email") ? msg : "",
+        username: msg.includes("Username") ? msg : "",
+        password: msg.includes("Password") ? msg : "",
+      });
+    }
+  }
+);
