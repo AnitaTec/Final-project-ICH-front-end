@@ -1,0 +1,156 @@
+.page {
+  display: flex;
+  flex-direction: column;
+}
+
+.mainRow {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+}
+
+.contentWrapper {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.main {
+  width: 100%;
+  max-width: 935px;
+  align-self: stretch;
+  margin-top: 40px;
+}
+
+.contentRow {
+  display: flex;
+  width: 100%;
+}
+
+.textBlock {
+  width: 100%;
+}
+
+/* ===== HEADER ПРОФИЛЯ ===== */
+
+.profileHeader {
+  display: flex;
+  gap: 86px;
+  margin-bottom: 74px;
+}
+
+.avatarWrap {
+  width: 168px;
+  height: 168px;
+  padding: 4px;
+  border-radius: 50%;
+  background: conic-gradient(
+    #feda75,
+    #fa7e1e,
+    #d62976,
+    #962fbf,
+    #4f5bd5,
+    #feda75
+  );
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatarInner {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.info {
+  flex: 1;
+}
+
+.topRow {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  margin-bottom: 20px;
+}
+
+.username {
+  font-size: 20px;
+  font-weight: 400;
+}
+
+.editBtn {
+  height: 32px;
+  width: 169px;
+  border-radius: 8px;
+  background-color: #efefef;
+  font-size: 14px;
+  line-height: 32px;
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+  color: #000000;
+}
+
+.stats {
+  display: flex;
+  gap: 40px;
+  list-style: none;
+  margin: 0 0 19px;
+  line-height: 18px;
+  font-size: 16px;
+}
+
+.statNumber {
+  font-weight: 600;
+  margin-right: 3px;
+}
+
+.bio {
+  font-size: 14px;
+  line-height: 18px;
+}
+
+.link {
+  color: #00376b;
+  text-decoration: none;
+}
+
+.postsSection {
+  margin-bottom: 215px;
+}
+
+.postsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+}
+
+.postItem {
+  position: relative;
+  width: 100%;
+  padding-top: 100%; /* квадрат */
+  overflow: hidden;
+}
+
+/* картинка растягивается под квадрат */
+.postImg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}

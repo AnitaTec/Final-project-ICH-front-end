@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import styles from "./Menu.module.css";
+import ProfileImg from "../../assets/img/Profile.png";
 
 import IchImg from "../../assets/icons/ICHgram.svg";
 import HomeImg from "../../assets/icons/Home.svg";
@@ -112,7 +113,6 @@ const Menu = () => {
           </div>
         </li>
 
-        {/* ✅ Исправленный CREATE — popup, без перехода на новую страницу */}
         <li>
           <div
             className={styles.popUp}
@@ -126,6 +126,22 @@ const Menu = () => {
             Create
             {showCreate && <CreatePopup onClose={() => setShowCreate(false)} />}
           </div>
+        </li>
+        <li>
+          <Link
+            to="/profile"
+            className={styles.profileLink}
+            style={{
+              fontWeight: location.pathname === "/profile" ? "700" : "400",
+            }}
+          >
+            <img
+              src={ProfileImg}
+              alt="Profile"
+              className={styles.profileIcon}
+            />
+            Profile
+          </Link>
         </li>
       </ul>
     </nav>

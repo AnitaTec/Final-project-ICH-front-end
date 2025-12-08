@@ -5,6 +5,8 @@
   padding: 20px 0;
   color: #777;
   font-size: 14px;
+  z-index: 2000;
+  background-color: #fff;
 }
 
 .footer nav {

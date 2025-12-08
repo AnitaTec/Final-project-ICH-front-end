@@ -7,6 +7,8 @@ import NotFoundPage from "./NotFoundPage/NotFoundPage.jsx";
 import MyProfilePage from "./MyProfilePage/MyProfilePage.jsx";
 import ExplorePage from "./ExplorePage/ExplorePage.jsx";
 import ResetPage from "./ResetPage/ResetPage.jsx";
+import EditProfile from "./EditProfile/EditProfile.jsx";
+
 const Navigation = () => {
   return (
     <Routes>
@@ -16,6 +18,8 @@ const Navigation = () => {
       <Route path="/signupError" element={<ResetPage />} />
       <Route path="/profile" element={<MyProfilePage />} />
       <Route path="/explore" element={<ExplorePage />} />
+      <Route path="/edit" element={<EditProfile />} />
+
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );

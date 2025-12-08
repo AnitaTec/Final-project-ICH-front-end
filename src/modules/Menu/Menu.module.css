@@ -35,9 +35,20 @@
   font-size: 16px;
   line-height: 20px;
   font-weight: 400;
+  height: 48px;
 }
 
-/* mobile */
+.profileIcon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.profileLink {
+  margin-top: 30px;
+}
+
 @media (max-width: 900px) {
   .menu {
     width: 80px;
