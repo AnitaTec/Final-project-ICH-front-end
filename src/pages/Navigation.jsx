@@ -9,17 +9,25 @@ import ExplorePage from "./ExplorePage/ExplorePage.jsx";
 import ResetPage from "./ResetPage/ResetPage.jsx";
 import EditProfile from "./EditProfile/EditProfile.jsx";
 
+import PublicRoute from "../shared/components/PublicRoute/PublicRoute.jsx";
+import PrivateRoute from "../shared/components/PrivateRoute/PrivateRoute.jsx";
+
 const Navigation = () => {
   return (
     <Routes>
-      <Route path="/" element={<LoginPage />} />
-      <Route path="/home" element={<HomePage />} />
-      <Route path="/register" element={<RegisterPage />} />
-      <Route path="/signupError" element={<ResetPage />} />
+      <Route element={<PrivateRoute />}>
+        <Route path="/home" element={<HomePage />} />
+      </Route>
+
+      <Route element={<PublicRoute />}>
+        <Route path="/" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/signupError" element={<ResetPage />} />
+      </Route>
+
       <Route path="/profile" element={<MyProfilePage />} />
       <Route path="/explore" element={<ExplorePage />} />
       <Route path="/edit" element={<EditProfile />} />
-
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );

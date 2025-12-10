@@ -33,8 +33,12 @@ const LoginForm = ({ submitForm, isSubmitSucces, requestErrors }) => {
     }
   }, [isSubmitSucces, reset]);
 
-  const onSubmit = (values) => {
-    submitForm(values);
+  const onSubmit = ({ identifier, password }) => {
+    const payload = identifier.includes("@")
+      ? { email: identifier, password }
+      : { username: identifier, password };
+
+    submitForm(payload);
   };
 
   return (
