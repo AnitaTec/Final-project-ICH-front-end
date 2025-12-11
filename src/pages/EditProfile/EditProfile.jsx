@@ -1,29 +1,71 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+
+import { getCurrentUser } from "../../store/auth/authOperations";
+import { selectUser } from "../../store/auth/authSelectors";
+import * as authApi from "../../shared/api/auth-api";
+
 import Menu from "../../modules/Menu/Menu";
 import Footer from "../../modules/Footer/Footer";
 import styles from "./EditProfile.module.css";
 import ProfileImg from "../../assets/img/Profile.png";
 
 const EditProfile = () => {
-  const [avatarPreview, setAvatarPreview] = useState(ProfileImg);
-  const [username, setUsername] = useState("ichschool");
-  const [about, setAbout] = useState(
-    "- Гарантия помощи с трудоустройством в ведущие IT-компании, Гарантия помощи с трудоустройством в ведущие IT-компании,Гарантия помощи с трудоустройством в ведущие IT-компании,Гарантия помощи с трудоустройством в ведущие IT-компании"
-  );
+  const dispatch = useDispatch();
+  const user = useSelector(selectUser);
+
+  const [avatarPreview, setAvatarPreview] = useState(null);
+  const [avatarBase64, setAvatarBase64] = useState(null);
+  const [username, setUsername] = useState("");
+  const [about, setAbout] = useState("");
+
   const fileInputRef = useRef(null);
 
-  const handleNewPhotoClick = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
+  useEffect(() => {
+    dispatch(getCurrentUser());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (user) {
+      if (!username) {
+        setUsername(user.username || "");
+      }
+      if (avatarPreview === null) {
+        setAvatarPreview(user.avatarURL || "");
+      }
     }
+  }, [user]);
+
+  const handleNewPhotoClick = () => {
+    fileInputRef.current?.click();
   };
 
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const url = URL.createObjectURL(file);
-    setAvatarPreview(url);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64 = reader.result;
+      setAvatarBase64(base64);
+      setAvatarPreview(base64);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const payload = {
+      username,
+      avatar: avatarBase64 || null,
+    };
+
+    try {
+      await authApi.updateProfile(payload);
+
+      dispatch(getCurrentUser());
+    } catch {}
   };
 
   return (
@@ -39,7 +81,7 @@ const EditProfile = () => {
                 <section className={styles.topCard}>
                   <div className={styles.topLeft}>
                     <img
-                      src={avatarPreview}
+                      src={avatarPreview || ProfileImg}
                       alt="Avatar"
                       className={styles.avatar}
                     />
@@ -66,7 +108,7 @@ const EditProfile = () => {
                   />
                 </section>
 
-                <form className={styles.form}>
+                <form className={styles.form} onSubmit={handleSubmit}>
                   <label className={styles.field}>
                     <span className={styles.labelText}>Username</span>
                     <input

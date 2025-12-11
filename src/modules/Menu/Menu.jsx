@@ -1,5 +1,8 @@
 import { useState } from "react";
+import { useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
+
+import { selectUser } from "../../store/auth/authSelectors";
 import styles from "./Menu.module.css";
 import ProfileImg from "../../assets/img/Profile.png";
 
@@ -27,6 +30,9 @@ const Menu = () => {
   const [showCreate, setShowCreate] = useState(false);
 
   const location = useLocation();
+  const user = useSelector(selectUser);
+
+  const avatarSrc = user?.avatarURL || ProfileImg;
 
   const getIcon = (type) => {
     switch (type) {
@@ -135,11 +141,7 @@ const Menu = () => {
               fontWeight: location.pathname === "/profile" ? "700" : "400",
             }}
           >
-            <img
-              src={ProfileImg}
-              alt="Profile"
-              className={styles.profileIcon}
-            />
+            <img src={avatarSrc} alt="Profile" className={styles.profileIcon} />
             Profile
           </Link>
         </li>

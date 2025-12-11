@@ -51,3 +51,19 @@ export const getCurrentUser = createAsyncThunk(
     }
   }
 );
+
+export const updateProfile = createAsyncThunk(
+  "auth/updateProfile",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const data = await authApi.updateProfile(payload);
+      return data;
+    } catch (error) {
+      const msg = error?.response?.data?.message || error?.message;
+
+      return rejectWithValue({
+        username: msg.includes("Username") ? msg : "",
+      });
+    }
+  }
+);

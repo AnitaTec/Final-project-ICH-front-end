@@ -1,4 +1,7 @@
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { selectUser } from "../../store/auth/authSelectors";
+
 import Menu from "../../modules/Menu/Menu";
 import Footer from "../../modules/Footer/Footer";
 import styles from "./MyProfilePage.module.css";
@@ -7,6 +10,10 @@ import TestPost2 from "../../assets/img/TestPost2.png";
 import ProfileImg from "../../assets/img/Profile.png";
 
 const MyProfilePage = () => {
+  const user = useSelector(selectUser);
+  const username = user?.username || user?.email || "";
+  const avatarSrc = user?.avatarURL || ProfileImg;
+
   return (
     <div className={styles.page}>
       <div className={styles.mainRow}>
@@ -19,7 +26,7 @@ const MyProfilePage = () => {
                   <div className={styles.avatarWrap}>
                     <div className={styles.avatarInner}>
                       <img
-                        src={ProfileImg}
+                        src={avatarSrc}
                         alt="Profile avatar"
                         className={styles.avatar}
                       />
@@ -28,7 +35,7 @@ const MyProfilePage = () => {
 
                   <div className={styles.info}>
                     <div className={styles.topRow}>
-                      <h2 className={styles.username}>itcareerhub</h2>
+                      <h2 className={styles.username}>{username}</h2>
 
                       <Link to="/edit" className={styles.editBtn}>
                         Edit profile
@@ -51,7 +58,7 @@ const MyProfilePage = () => {
                     <div className={styles.bio}>
                       <p>• Гарантия помощи с трудоустройством</p>
                       <p>• Выпускники зарабатывают от 45k евро</p>
-                      <p>Бесплатная </p>
+                      <p>Бесплатная</p>
                       <a
                         href="#"
                         onClick={(e) => e.preventDefault()}

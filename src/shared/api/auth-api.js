@@ -1,4 +1,5 @@
 import instance from "./instance";
+import { store } from "../../store/store";
 
 export const register = async (payload) => {
   const { data } = await instance.post("/auth/register", payload);
@@ -7,11 +8,8 @@ export const register = async (payload) => {
 
 export const login = async (payload) => {
   const { data } = await instance.post("/auth/login", payload);
-
-
   instance.defaults.headers["Authorization"] = `Bearer ${data.accessToken}`;
-
-  return data; 
+  return data;
 };
 
 export const logout = async () => {
@@ -26,4 +24,17 @@ export const getCurrent = async (token) => {
     },
   });
   return data;
+};
+
+export const updateProfile = async (payload) => {
+  const { accessToken } = store.getState().auth;
+
+  const response = await instance.patch("/auth/profile", payload, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+    },
+  });
+
+  return response.data;
 };
