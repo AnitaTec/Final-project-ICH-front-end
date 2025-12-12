@@ -18,6 +18,14 @@ const initialState = {
 const authSlice = createSlice({
   name: "auth",
   initialState,
+  reducers: {
+    logout: () => initialState,
+    setCredentials: (state, { payload }) => {
+      state.user = payload.user;
+      state.accessToken = payload.accessToken;
+      state.refreshToken = payload.refreshToken;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(registerUser.pending, (state) => {
@@ -71,7 +79,7 @@ const authSlice = createSlice({
       })
       .addCase(updateProfile.fulfilled, (state, { payload }) => {
         state.loading = false;
-        state.user = payload.user;
+        state.user = { ...state.user, ...payload };
       })
       .addCase(updateProfile.rejected, (state, { payload }) => {
         state.loading = false;
@@ -81,5 +89,5 @@ const authSlice = createSlice({
 });
 
 export default authSlice.reducer;
-export { registerUser };
-export { loginUser };
+export { registerUser, loginUser, getCurrentUser, updateProfile };
+export const { logout, setCredentials } = authSlice.actions;

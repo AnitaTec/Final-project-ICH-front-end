@@ -18,6 +18,7 @@ const EditProfile = () => {
   const [avatarBase64, setAvatarBase64] = useState(null);
   const [username, setUsername] = useState("");
   const [about, setAbout] = useState("");
+  const [website, setWebsite] = useState("");
 
   const fileInputRef = useRef(null);
 
@@ -27,12 +28,10 @@ const EditProfile = () => {
 
   useEffect(() => {
     if (user) {
-      if (!username) {
-        setUsername(user.username || "");
-      }
-      if (avatarPreview === null) {
-        setAvatarPreview(user.avatarURL || "");
-      }
+      if (!username) setUsername(user.username || "");
+      if (!about) setAbout(user.about || "");
+      if (!website) setWebsite(user.website || "");
+      if (avatarPreview === null) setAvatarPreview(user.avatarURL || "");
     }
   }, [user]);
 
@@ -59,11 +58,12 @@ const EditProfile = () => {
     const payload = {
       username,
       avatar: avatarBase64 || null,
+      about,
+      website,
     };
 
     try {
       await authApi.updateProfile(payload);
-
       dispatch(getCurrentUser());
     } catch {}
   };
@@ -121,7 +121,12 @@ const EditProfile = () => {
 
                   <label className={styles.field}>
                     <span className={styles.labelText}>Website</span>
-                    <input className={styles.input} type="text" />
+                    <input
+                      className={styles.input}
+                      type="text"
+                      value={website}
+                      onChange={(e) => setWebsite(e.target.value)}
+                    />
                   </label>
 
                   <label className={styles.field}>

@@ -13,6 +13,7 @@ const MyProfilePage = () => {
   const user = useSelector(selectUser);
   const username = user?.username || user?.email || "";
   const avatarSrc = user?.avatarURL || ProfileImg;
+  const website = user?.website || "";
 
   return (
     <div className={styles.page}>
@@ -36,7 +37,6 @@ const MyProfilePage = () => {
                   <div className={styles.info}>
                     <div className={styles.topRow}>
                       <h2 className={styles.username}>{username}</h2>
-
                       <Link to="/edit" className={styles.editBtn}>
                         Edit profile
                       </Link>
@@ -56,16 +56,21 @@ const MyProfilePage = () => {
                     </ul>
 
                     <div className={styles.bio}>
-                      <p>• Гарантия помощи с трудоустройством</p>
-                      <p>• Выпускники зарабатывают от 45k евро</p>
-                      <p>Бесплатная</p>
-                      <a
-                        href="#"
-                        onClick={(e) => e.preventDefault()}
-                        className={styles.link}
-                      >
-                        bit.ly/your-link
-                      </a>
+                      {user?.about && <p>{user.about}</p>}
+                      {website && (
+                        <a
+                          href={
+                            website.startsWith("http")
+                              ? website
+                              : `https://${website}`
+                          }
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={styles.link}
+                        >
+                          {website}
+                        </a>
+                      )}
                     </div>
                   </div>
                 </header>

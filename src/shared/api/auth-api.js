@@ -36,5 +36,5 @@ export const updateProfile = async (payload) => {
     },
   });
 
-  return response.data;
+  return response.data.user;
 };
