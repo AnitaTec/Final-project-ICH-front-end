@@ -15,7 +15,7 @@ const TestLogoutButton = () => {
       console.error("Logout error:", error);
     } finally {
       dispatch(logoutAction());
-      navigate("/login");
+      navigate("/");
     }
   };
 

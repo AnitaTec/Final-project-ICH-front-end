@@ -56,3 +56,17 @@ export const updateProfile = async (payload) => {
 
   return response.data.user;
 };
+
+export const getUserById = async (userId, token) => {
+  const { data } = await instance.get(`/users/${userId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return data;
+};
+
+export const fetchUserByUsername = async (username, token) => {
+  const { data } = await instance.get(`/users/${username}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return data;
+};

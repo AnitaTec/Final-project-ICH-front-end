@@ -8,7 +8,8 @@ import MyProfilePage from "./MyProfilePage/MyProfilePage.jsx";
 import ExplorePage from "./ExplorePage/ExplorePage.jsx";
 import ResetPage from "./ResetPage/ResetPage.jsx";
 import EditProfile from "./EditProfile/EditProfile.jsx";
-
+import MessagesPage from "./Messages/MessagesPage.jsx";
+import UserProfilePage from "./UserProfilePage/UserProfilePage.jsx";
 import PublicRoute from "../shared/components/PublicRoute/PublicRoute.jsx";
 import PrivateRoute from "../shared/components/PrivateRoute/PrivateRoute.jsx";
 
@@ -26,7 +27,9 @@ const Navigation = () => {
       </Route>
 
       <Route path="/profile" element={<MyProfilePage />} />
+      <Route path="/users/:username" element={<UserProfilePage />} />
       <Route path="/explore" element={<ExplorePage />} />
+      <Route path="/messages" element={<MessagesPage />} />
       <Route path="/edit" element={<EditProfile />} />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
