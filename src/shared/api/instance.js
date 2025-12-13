@@ -10,8 +10,12 @@ instance.interceptors.response.use(
   (res) => res,
   async (error) => {
     const originalRequest = error.config;
-    if (error.status === 401 && error.message === "accessToken expired") {
+    const status = error.response?.status;
+    const message = error.response?.data?.message;
+
+    if (status === 401 && message === "accessToken expired") {
       const { auth } = store.getState();
+
       try {
         const { data } = await axios.post(
           `${import.meta.env.VITE_API_URL}/auth/refresh`,
@@ -19,18 +23,18 @@ instance.interceptors.response.use(
             refreshToken: auth.refreshToken,
           }
         );
-
         instance.defaults.headers[
           "Authorization"
         ] = `Bearer ${data.accessToken}`;
         store.dispatch(setCredentials(data));
+        originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
         return instance(originalRequest);
       } catch {
         store.dispatch(logout());
+        return Promise.reject(error);
       }
-    } else {
-      return Promise.reject(error);
     }
+    return Promise.reject(error);
   }
 );
 

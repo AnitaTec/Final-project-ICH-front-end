@@ -23,7 +23,7 @@ import MessageAct from "../../assets/icons/messageActive.svg";
 import CreatePopup from "../../modules/Create/CreatePopup.jsx";
 import NotificationsPopup from "../../modules/Notifications/NotificationsPopup.jsx";
 import SearchPopup from "../../modules/Search/SearchPopup.jsx";
-
+import TestLogoutButton from "../../modules/TestLogoutButton/TestLogoutButton.jsx";
 const Menu = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
@@ -146,6 +146,7 @@ const Menu = () => {
           </Link>
         </li>
       </ul>
+      <TestLogoutButton />
     </nav>
   );
 };

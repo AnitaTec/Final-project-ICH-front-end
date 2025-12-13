@@ -9,3 +9,5 @@ export const selectAuthRequest = (store) => {
 export const selectTokens = (store) => Boolean(store.auth.accessToken);
 
 export const selectUser = (store) => store.auth.user;
+
+export const selectAccessToken = (state) => state.auth.accessToken;

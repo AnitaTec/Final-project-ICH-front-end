@@ -12,9 +12,27 @@ export const login = async (payload) => {
   return data;
 };
 
+// export const logout = async () => {
+//   await instance.post("/auth/logout");
+//   instance.defaults.headers["Authorization"] = "";
+// };
+
 export const logout = async () => {
-  await instance.post("/logout");
+  const { accessToken } = store.getState().auth;
+
+  if (!accessToken) return;
+
+  const { data } = await instance.post(
+    "/auth/logout",
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    }
+  );
   instance.defaults.headers["Authorization"] = "";
+  return data;
 };
 
 export const getCurrent = async (token) => {
