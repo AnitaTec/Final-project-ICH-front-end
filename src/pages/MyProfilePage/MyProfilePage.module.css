@@ -32,7 +32,6 @@
   width: 100%;
 }
 
-/* ===== HEADER ПРОФИЛЯ ===== */
 
 .profileHeader {
   display: flex;
@@ -84,7 +83,7 @@
   display: flex;
   align-items: center;
   gap: 22px;
-  margin-bottom: 20px;
+  margin-bottom: 28px;
 }
 
 .username {
@@ -142,11 +141,10 @@
 .postItem {
   position: relative;
   width: 100%;
-  padding-top: 100%; /* квадрат */
+  padding-top: 100%; 
   overflow: hidden;
 }
 
-/* картинка растягивается под квадрат */
 .postImg {
   position: absolute;
   inset: 0;

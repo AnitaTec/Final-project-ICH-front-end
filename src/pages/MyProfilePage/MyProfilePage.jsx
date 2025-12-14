@@ -1,19 +1,29 @@
 import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { selectUser } from "../../store/auth/authSelectors";
 
 import Menu from "../../modules/Menu/Menu";
 import Footer from "../../modules/Footer/Footer";
 import styles from "./MyProfilePage.module.css";
-import TestPost from "../../assets/img/TestPost.png";
-import TestPost2 from "../../assets/img/TestPost2.png";
 import ProfileImg from "../../assets/img/Profile.png";
 
+import { selectMyPosts } from "../../store/posts/postsSelectors";
+import { fetchMyPosts } from "../../store/posts/postsSlice";
+
 const MyProfilePage = () => {
+  const dispatch = useDispatch();
+
   const user = useSelector(selectUser);
+  const posts = useSelector(selectMyPosts);
+
   const username = user?.username || user?.email || "";
   const avatarSrc = user?.avatarURL || ProfileImg;
   const website = user?.website || "";
+
+  useEffect(() => {
+    dispatch(fetchMyPosts());
+  }, [dispatch]);
 
   return (
     <div className={styles.page}>
@@ -44,7 +54,10 @@ const MyProfilePage = () => {
 
                     <ul className={styles.stats}>
                       <li>
-                        <span className={styles.statNumber}>129</span> posts
+                        <span className={styles.statNumber}>
+                          {posts.length}
+                        </span>{" "}
+                        posts
                       </li>
                       <li>
                         <span className={styles.statNumber}>9,993</span>{" "}
@@ -77,48 +90,15 @@ const MyProfilePage = () => {
 
                 <section className={styles.postsSection}>
                   <div className={styles.postsGrid}>
-                    <div className={styles.postItem}>
-                      <img
-                        src={TestPost}
-                        alt="Test post 1"
-                        className={styles.postImg}
-                      />
-                    </div>
-                    <div className={styles.postItem}>
-                      <img
-                        src={TestPost2}
-                        alt="Test post 2"
-                        className={styles.postImg}
-                      />
-                    </div>
-                    <div className={styles.postItem}>
-                      <img
-                        src={TestPost}
-                        alt="Test post 3"
-                        className={styles.postImg}
-                      />
-                    </div>
-                    <div className={styles.postItem}>
-                      <img
-                        src={TestPost2}
-                        alt="Test post 4"
-                        className={styles.postImg}
-                      />
-                    </div>
-                    <div className={styles.postItem}>
-                      <img
-                        src={TestPost}
-                        alt="Test post 5"
-                        className={styles.postImg}
-                      />
-                    </div>
-                    <div className={styles.postItem}>
-                      <img
-                        src={TestPost2}
-                        alt="Test post 6"
-                        className={styles.postImg}
-                      />
-                    </div>
+                    {posts.map((p) => (
+                      <div key={p._id || p.id} className={styles.postItem}>
+                        <img
+                          src={p.image}
+                          alt={p.caption || "post"}
+                          className={styles.postImg}
+                        />
+                      </div>
+                    ))}
                   </div>
                 </section>
               </div>

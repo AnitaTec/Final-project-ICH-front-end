@@ -1,0 +1,9 @@
+.btnLogout {
+  margin-top: 30px;
+  font-weight: 600;
+  font-size: 14px;
+  border: none;
+  border-radius: 8px;
+  background-color: #efefef;
+  padding: 5px 10px;
+}

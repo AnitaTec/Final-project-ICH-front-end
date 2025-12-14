@@ -1,27 +1,71 @@
 import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import EmojiPicker from "emoji-picker-react";
 import styles from "./CreatePopup.module.css";
 
 import DropZoneIcon from "../../assets/icons/Drop.svg";
 import EmojiIcon from "../../assets/icons/Emoji.svg";
 
+import { createPost } from "../../store/posts/postsSlice";
+
+const fileToDataUrl = (file) =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || ""));
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+
 const CreatePopup = ({ onClose }) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const [text, setText] = useState("");
   const [showEmoji, setShowEmoji] = useState(false);
 
-  const onDrop = useCallback((acceptedFiles) => {
-    console.log("Selected file:", acceptedFiles[0]);
+  const [imageDataUrl, setImageDataUrl] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+
+  const onDrop = useCallback(async (acceptedFiles) => {
+    const file = acceptedFiles?.[0];
+    if (!file) return;
+
+    const dataUrl = await fileToDataUrl(file);
+    setImageDataUrl(dataUrl);
   }, []);
 
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
     multiple: false,
     accept: { "image/*": [] },
+    maxSize: 3 * 1024 * 1024,
   });
 
   const handleEmojiClick = (emojiData) => {
     setText((prev) => prev + emojiData.emoji);
+  };
+
+  const onShare = async () => {
+    if (!imageDataUrl) return;
+
+    setIsSaving(true);
+    try {
+      await dispatch(
+        createPost({
+          image: imageDataUrl,
+          caption: text.trim(),
+        })
+      );
+
+      onClose();
+      navigate("/profile");
+    } catch (e) {
+      console.log("createPost error:", e);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -42,13 +86,24 @@ const CreatePopup = ({ onClose }) => {
         }}
       >
         <div className={styles.header}>
-          <p>Create new post</p> <button>Share</button>
+          <p>Create new post</p>
+          <button
+            type="button"
+            onClick={onShare}
+            disabled={isSaving || !imageDataUrl}
+          >
+            Share
+          </button>
         </div>
 
         <div className={styles.content}>
           <div {...getRootProps()} className={styles.dropzone}>
             <input {...getInputProps()} />
-            <img src={DropZoneIcon} alt="Drop Here" className={styles.icon} />
+            {imageDataUrl ? (
+              <img src={imageDataUrl} alt="Selected" className={styles.icon} />
+            ) : (
+              <img src={DropZoneIcon} alt="Drop Here" className={styles.icon} />
+            )}
           </div>
 
           <div className={styles.rightBlock}>

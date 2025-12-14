@@ -1,8 +1,8 @@
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-
 import { logout as logoutAction } from "../../store/auth/authSlice";
 import { logout as logoutApi } from "../../shared/api/auth-api";
+import styles from "./TestLogoutButton.module.css";
 
 const TestLogoutButton = () => {
   const dispatch = useDispatch();
@@ -20,7 +20,7 @@ const TestLogoutButton = () => {
   };
 
   return (
-    <button type="button" onClick={handleLogout}>
+    <button  className={styles.btnLogout} type="button" onClick={handleLogout}>
       Logout
     </button>
   );
