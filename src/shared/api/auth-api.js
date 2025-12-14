@@ -70,3 +70,14 @@ export const fetchUserByUsername = async (username, token) => {
   });
   return data;
 };
+
+export const searchUsers = async (q) => {
+  const { accessToken } = store.getState().auth;
+
+  const { data } = await instance.get("/users/search", {
+    params: { q },
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+
+  return data;
+};

@@ -1,19 +1,26 @@
-import axios from "axios";
-
-const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
-});
+import instance from "./instance";
 
 export const fetchConversations = async (token) => {
-  const { data } = await api.get("/messages/conversations", {
+  const { data } = await instance.get("/messages/conversations", {
     headers: { Authorization: `Bearer ${token}` },
   });
   return data;
 };
 
 export const fetchMessages = async (conversationId, token) => {
-  const { data } = await api.get(
+  const { data } = await instance.get(
     `/messages/conversations/${conversationId}/messages`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return data;
+};
+
+export const createConversation = async (participantId, token) => {
+  const { data } = await instance.post(
+    "/messages/conversations",
+    { participantId },
     {
       headers: { Authorization: `Bearer ${token}` },
     }

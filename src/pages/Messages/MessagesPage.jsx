@@ -1,11 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import styles from "./MessagesPage.module.css";
-
 import Menu from "../../modules/Menu/Menu";
 import Footer from "../../modules/Footer/Footer";
-
 import { selectUser } from "../../store/auth/authSelectors";
 import {
   fetchConversations,
@@ -23,10 +21,11 @@ import {
   isSameId,
   getOtherParticipant,
   getLastMsgPreview,
-} from "./messages.helpers";
+} from "../Messages/messages.helpers";
 
 const MessagesPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const user = useSelector(selectUser);
   const accessToken = useSelector((state) => state.auth.accessToken);
@@ -60,10 +59,27 @@ const MessagesPage = () => {
   const [text, setText] = useState("");
 
   const bottomRef = useRef(null);
-  const activeIdRef = useRef(null);
+
   useEffect(() => {
-    activeIdRef.current = activeId;
-  }, [activeId]);
+    const params = new URLSearchParams(location.search);
+    const cid = params.get("cid");
+    if (!cid) return;
+
+    let cancelled = false;
+
+    Promise.resolve().then(() => {
+      if (cancelled) return;
+
+      setActiveId((prev) => {
+        if (String(prev) === String(cid)) return prev;
+        return cid;
+      });
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [location.search]);
 
   const activeConversation = useMemo(
     () => conversations.find((c) => String(c._id) === String(activeId)),
@@ -73,6 +89,7 @@ const MessagesPage = () => {
   const otherInActive = activeConversation
     ? getOtherParticipant(activeConversation, myId)
     : null;
+
   useEffect(() => {
     if (!accessToken) return;
 
@@ -80,30 +97,28 @@ const MessagesPage = () => {
 
     const s = connectSocket(accessToken);
 
-    const onNewMessage = (msg) => {
+    s.on("message:new", (msg) => {
       const convId = msg.conversationId?._id || msg.conversationId;
-      if (convId && String(convId) === String(activeIdRef.current)) {
+      if (convId && String(convId) === String(activeId)) {
         setMessages((prev) => [...prev, msg]);
       }
-    };
+    });
 
-    const onConversationUpdated = ({ conversationId, lastMessage }) => {
+    s.on("conversation:updated", ({ conversationId, lastMessage }) => {
       setConversations((prev) =>
         prev.map((c) =>
           String(c._id) === String(conversationId) ? { ...c, lastMessage } : c
         )
       );
-    };
-
-    s.on("message:new", onNewMessage);
-    s.on("conversation:updated", onConversationUpdated);
+    });
 
     return () => {
-      s.off("message:new", onNewMessage);
-      s.off("conversation:updated", onConversationUpdated);
+      s.off("message:new");
+      s.off("conversation:updated");
       disconnectSocket();
     };
-  }, [accessToken]);
+  }, [accessToken, activeId]);
+
   useEffect(() => {
     if (!accessToken || !activeId) return;
 
@@ -141,6 +156,7 @@ const MessagesPage = () => {
     <div className={styles.page}>
       <div className={styles.contentWrapper}>
         <Menu />
+
         <main className={styles.main}>
           <div className={styles.wrap}>
             <div className={styles.left}>
@@ -166,6 +182,7 @@ const MessagesPage = () => {
                         src={other?.avatarURL || ProfileImg}
                         alt=""
                       />
+
                       <div className={styles.convMeta}>
                         <div className={styles.convName}>
                           {other?.username || other?.email || "User"}
@@ -185,6 +202,7 @@ const MessagesPage = () => {
                 })}
               </div>
             </div>
+
             <div className={styles.right}>
               {!activeConversation ? (
                 <div className={styles.empty}>Choose a chat</div>

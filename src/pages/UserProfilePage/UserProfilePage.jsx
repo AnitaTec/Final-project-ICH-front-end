@@ -8,6 +8,7 @@ import styles from "./UserProfilePage.module.css";
 import ProfileImg from "../../assets/img/Profile.png";
 
 import { fetchUserByUsername } from "../../shared/api/auth-api";
+import { createConversation } from "../../shared/api/messagesApi"; // ✅ ДОБАВИЛИ
 
 const UserProfilePage = () => {
   const { username } = useParams();
@@ -67,7 +68,6 @@ const UserProfilePage = () => {
       </div>
     );
   }
-
   if (status === "notfound") {
     return (
       <div className={styles.page}>
@@ -98,8 +98,23 @@ const UserProfilePage = () => {
 
   const avatarSrc = profile?.avatarURL || ProfileImg;
   const website = profile?.website || "";
+  const onMessage = async () => {
+    if (!accessToken || !profile?._id) return;
 
-  const onMessage = () => navigate("/messages");
+    try {
+      const conv = await createConversation(profile._id, accessToken);
+      const cid = conv?._id || conv?.id;
+
+      if (cid) {
+        navigate(`/messages?cid=${cid}`);
+      } else {
+        navigate("/messages");
+      }
+    } catch (e) {
+      console.log("createConversation error:", e);
+      navigate("/messages");
+    }
+  };
 
   return (
     <div className={styles.page}>
