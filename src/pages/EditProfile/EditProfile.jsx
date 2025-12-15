@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 import { getCurrentUser } from "../../store/auth/authOperations";
 import { selectUser } from "../../store/auth/authSelectors";
@@ -12,6 +13,7 @@ import ProfileImg from "../../assets/img/Profile.png";
 
 const EditProfile = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const user = useSelector(selectUser);
 
   const [avatarPreview, setAvatarPreview] = useState(null);
@@ -22,17 +24,22 @@ const EditProfile = () => {
 
   const fileInputRef = useRef(null);
 
+  const didInitRef = useRef(false);
+
   useEffect(() => {
     dispatch(getCurrentUser());
   }, [dispatch]);
 
   useEffect(() => {
-    if (user) {
-      if (!username) setUsername(user.username || "");
-      if (!about) setAbout(user.about || "");
-      if (!website) setWebsite(user.website || "");
-      if (avatarPreview === null) setAvatarPreview(user.avatarURL || "");
-    }
+    if (!user) return;
+    if (didInitRef.current) return;
+
+    didInitRef.current = true;
+
+    setUsername(user.username || "");
+    setAbout(user.about || "");
+    setWebsite(user.website || "");
+    setAvatarPreview(user.avatarURL || "");
   }, [user]);
 
   const handleNewPhotoClick = () => {
@@ -64,7 +71,8 @@ const EditProfile = () => {
 
     try {
       await authApi.updateProfile(payload);
-      dispatch(getCurrentUser());
+      await dispatch(getCurrentUser());
+      navigate("/profile");
     } catch {}
   };
 

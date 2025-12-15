@@ -13,6 +13,8 @@ import { createConversation } from "../../shared/api/messagesApi";
 import { fetchPostsByUsername } from "../../store/posts/postsSlice";
 import { makeSelectPostsByOwnerKey } from "../../store/posts/postsSelectors";
 
+import PostView from "../../modules/PostView/PostView";
+
 const UserProfilePage = () => {
   const { username } = useParams();
   const navigate = useNavigate();
@@ -22,6 +24,8 @@ const UserProfilePage = () => {
 
   const [profile, setProfile] = useState(null);
   const [status, setStatus] = useState("idle");
+
+  const [activePost, setActivePost] = useState(null);
 
   const safeUsername = useMemo(
     () => (username ? String(username) : ""),
@@ -198,7 +202,12 @@ const UserProfilePage = () => {
                 <section className={styles.postsSection}>
                   <div className={styles.postsGrid}>
                     {posts.map((p) => (
-                      <div key={p._id || p.id} className={styles.postItem}>
+                      <div
+                        key={p._id || p.id}
+                        className={styles.postItem}
+                        onClick={() => setActivePost(p)}
+                        style={{ cursor: "pointer" }}
+                      >
                         <img
                           src={p.image}
                           alt={p.caption || "post"}
@@ -213,7 +222,12 @@ const UserProfilePage = () => {
           </main>
         </div>
       </div>
+
       <Footer />
+
+      {activePost && (
+        <PostView post={activePost} onClose={() => setActivePost(null)} />
+      )}
     </div>
   );
 };

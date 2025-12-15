@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { selectUser } from "../../store/auth/authSelectors";
 
@@ -11,11 +11,15 @@ import ProfileImg from "../../assets/img/Profile.png";
 import { selectMyPosts } from "../../store/posts/postsSelectors";
 import { fetchMyPosts } from "../../store/posts/postsSlice";
 
+import PostView from "../../modules/PostView/PostView";
+
 const MyProfilePage = () => {
   const dispatch = useDispatch();
 
   const user = useSelector(selectUser);
   const posts = useSelector(selectMyPosts);
+
+  const [activePost, setActivePost] = useState(null);
 
   const username = user?.username || user?.email || "";
   const avatarSrc = user?.avatarURL || ProfileImg;
@@ -91,7 +95,12 @@ const MyProfilePage = () => {
                 <section className={styles.postsSection}>
                   <div className={styles.postsGrid}>
                     {posts.map((p) => (
-                      <div key={p._id || p.id} className={styles.postItem}>
+                      <div
+                        key={p._id || p.id}
+                        className={styles.postItem}
+                        onClick={() => setActivePost(p)}
+                        style={{ cursor: "pointer" }}
+                      >
                         <img
                           src={p.image}
                           alt={p.caption || "post"}
@@ -106,7 +115,12 @@ const MyProfilePage = () => {
           </main>
         </div>
       </div>
+
       <Footer />
+
+      {activePost && (
+        <PostView post={activePost} onClose={() => setActivePost(null)} />
+      )}
     </div>
   );
 };

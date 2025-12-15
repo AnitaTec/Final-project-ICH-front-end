@@ -104,6 +104,7 @@
   flex-direction: column;
   min-width: 0;
   background: #fff;
+  min-height: 0;
 }
 
 .chatHeader {
@@ -176,6 +177,8 @@
   flex: 1;
   overflow: auto;
   padding: 16px;
+  min-height: 0;
+  padding-bottom: 160px;
 }
 
 .msgRow {
@@ -220,7 +223,10 @@
 .chatInput {
   padding: 12px 16px;
   background: #fff;
-  margin-bottom: 90px;
+  position: sticky;
+  bottom: 90px;
+  z-index: 5;
+  margin-bottom: 0;
 }
 
 .chatInput input {
