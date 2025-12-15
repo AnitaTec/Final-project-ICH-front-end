@@ -12,11 +12,6 @@ export const login = async (payload) => {
   return data;
 };
 
-// export const logout = async () => {
-//   await instance.post("/auth/logout");
-//   instance.defaults.headers["Authorization"] = "";
-// };
-
 export const logout = async () => {
   const { accessToken } = store.getState().auth;
 

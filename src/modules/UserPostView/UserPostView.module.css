@@ -29,7 +29,6 @@
   display: flex;
 }
 
-/* FOTO blok */
 .left {
   width: 577px;
   flex: 0 0 577px;
@@ -97,14 +96,15 @@
   color: #262626;
 }
 
-.moreBtn {
+.followBtn {
   border: none;
   background: transparent;
+  color: #0095f6;
+  font-size: 12px;
+  line-height: 15.25px;
+  font-weight: 600;
   cursor: pointer;
-  font-size: 22px;
-  line-height: 18px;
-  color: #262626;
-  padding: 6px;
+  padding: 0;
 }
 
 .body {

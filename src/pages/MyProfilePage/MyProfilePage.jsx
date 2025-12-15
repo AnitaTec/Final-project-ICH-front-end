@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { selectUser } from "../../store/auth/authSelectors";
 
@@ -13,11 +13,18 @@ import { fetchMyPosts } from "../../store/posts/postsSlice";
 
 import PostView from "../../modules/PostView/PostView";
 
+import { fetchFollowInfo } from "../../store/follow/followSlice";
+import { selectFollowCountsByUserId } from "../../store/follow/followSelectors";
+
+import { resolveMyId } from "../../shared/utils/profileIdUtils";
+
 const MyProfilePage = () => {
   const dispatch = useDispatch();
 
   const user = useSelector(selectUser);
   const posts = useSelector(selectMyPosts);
+  const accessToken = useSelector((s) => s.auth.accessToken);
+  const followByUserId = useSelector((s) => s.follow?.byUserId || {});
 
   const [activePost, setActivePost] = useState(null);
 
@@ -25,9 +32,20 @@ const MyProfilePage = () => {
   const avatarSrc = user?.avatarURL || ProfileImg;
   const website = user?.website || "";
 
+  const myId = useMemo(() => {
+    return resolveMyId({ user, posts, followByUserId });
+  }, [user, posts, followByUserId]);
+
+  const counts = useSelector(selectFollowCountsByUserId(myId));
+
   useEffect(() => {
     dispatch(fetchMyPosts());
   }, [dispatch]);
+
+  useEffect(() => {
+    if (!accessToken || !myId) return;
+    dispatch(fetchFollowInfo({ userId: myId, accessToken }));
+  }, [dispatch, accessToken, myId]);
 
   return (
     <div className={styles.page}>
@@ -64,11 +82,16 @@ const MyProfilePage = () => {
                         posts
                       </li>
                       <li>
-                        <span className={styles.statNumber}>9,993</span>{" "}
+                        <span className={styles.statNumber}>
+                          {counts.followers}
+                        </span>{" "}
                         followers
                       </li>
                       <li>
-                        <span className={styles.statNumber}>59</span> following
+                        <span className={styles.statNumber}>
+                          {counts.following}
+                        </span>{" "}
+                        following
                       </li>
                     </ul>
 

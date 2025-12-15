@@ -4,10 +4,34 @@ import Footer from "../../modules/Footer/Footer";
 import styles from "./ExplorePage.module.css";
 
 import { fetchExplorePostsApi } from "../../shared/api/postsApi";
+import UserPostView from "../../modules/UserPostView/UserPostView";
 
 const ExplorePage = () => {
   const [posts, setPosts] = useState([]);
   const [status, setStatus] = useState("idle");
+  const [activePost, setActivePost] = useState(null);
+
+  const withOwnerObject = (p) => {
+    if (!p) return p;
+
+    if (p.owner && typeof p.owner === "object") return p;
+
+    const ownerUsername =
+      p.ownerUsername || p.username || p.ownerEmail || p.email || "";
+
+    const ownerAvatar = p.ownerAvatarURL || p.avatarURL || p.ownerAvatar || "";
+
+    if (!ownerUsername && !ownerAvatar) return p;
+
+    return {
+      ...p,
+      owner: {
+        username: ownerUsername || undefined,
+        email: ownerUsername || undefined,
+        avatarURL: ownerAvatar || undefined,
+      },
+    };
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -46,7 +70,12 @@ const ExplorePage = () => {
                 ) : (
                   <div className={styles.grid}>
                     {posts.map((p) => (
-                      <div key={p._id} className={styles.item}>
+                      <div
+                        key={p._id || p.id}
+                        className={styles.item}
+                        onClick={() => setActivePost(withOwnerObject(p))}
+                        style={{ cursor: "pointer" }}
+                      >
                         <img
                           src={p.image}
                           alt={p.caption || "post"}
@@ -61,7 +90,12 @@ const ExplorePage = () => {
           </main>
         </div>
       </div>
+
       <Footer />
+
+      {activePost && (
+        <UserPostView post={activePost} onClose={() => setActivePost(null)} />
+      )}
     </div>
   );
 };

@@ -5,6 +5,11 @@
   overflow: hidden;
 }
 
+.cardOpen {
+  height: auto;
+  overflow: visible;
+}
+
 .header {
   display: flex;
   align-items: start;
@@ -19,9 +24,7 @@
 
 .userInfo {
   display: flex;
-
   gap: 6px;
-
   margin-left: 10px;
 }
 
@@ -52,7 +55,7 @@
 
 .mainImg {
   width: 100%;
-  height: auto;
+  height: 503px;
   object-fit: cover;
 }
 
@@ -82,10 +85,30 @@
 
 .caption {
   padding: 6px 12px;
+  position: relative;
+  padding-right: 52px;
+}
+
+.captionText {
+  white-space: normal;
 }
 
 .bold {
   font-weight: 600;
+}
+
+.moreBtn {
+  border: none;
+  background: none;
+  cursor: pointer;
+  position: absolute;
+  right: 12px;
+  top: 6px;
+  color: #737373;
+  font-size: 12px;
+  line-height: 15px;
+  font-weight: 400;
+  padding: 0;
 }
 
 .comments {
@@ -93,6 +116,7 @@
   color: #737373;
   cursor: pointer;
   font-size: 14px;
+  margin-top: 8px;
 }
 
 .iconBtn {

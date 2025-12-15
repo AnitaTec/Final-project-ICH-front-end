@@ -45,7 +45,17 @@ export const fetchExplorePostsApi = async (limit = 24) => {
   return data;
 };
 
+export const fetchFeedPostsApi = async (limit = 24) => {
+  const { accessToken } = store.getState().auth;
+  const { data } = await instance.get("/posts/feed", {
+    params: { limit },
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  return data;
+};
+
 export const createPost = createPostApi;
 export const fetchMyPosts = fetchMyPostsApi;
 export const fetchPostsByUsername = fetchPostsByUsernameApi;
 export const fetchExplorePosts = fetchExplorePostsApi;
+export const fetchFeedPosts = fetchFeedPostsApi;

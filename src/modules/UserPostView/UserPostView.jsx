@@ -1,45 +1,56 @@
-import { useMemo, useState } from "react";
-import styles from "./PostView.module.css";
-import ProfileImg from "../../assets/img/Profile.png";
+import { useEffect, useMemo, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import styles from "./UserPostView.module.css";
 import Like from "../../assets/icons/Like.svg";
 import Comment from "../../assets/icons/Coment.svg";
 import Frame from "../../assets/icons/frame.png";
-import OptionsMenuModal from "../OptionsMenu/OptionsMenuModal";
 
-const safeId = (p) => p?._id || p?.id || p?.postId || p?.uuid || "";
+import {
+  safeId,
+  timeAgo,
+  getOwnerInfo,
+  getPostMeta,
+  getCommentView,
+} from "../../shared/utils/userPostsViewUtils";
 
-const timeAgo = (iso) => {
-  if (!iso) return "";
-  const ms = Date.now() - new Date(iso).getTime();
-  const sec = Math.max(1, Math.floor(ms / 1000));
-  const min = Math.floor(sec / 60);
-  const hr = Math.floor(min / 60);
-  const day = Math.floor(hr / 24);
-  const week = Math.floor(day / 7);
+import { selectUser } from "../../store/auth/authSelectors";
+import {
+  selectFollowCountsByUserId,
+  selectIsFollowingByUserId,
+} from "../../store/follow/followSelectors";
+import {
+  fetchFollowInfo,
+  setCounts,
+  setIsFollowing,
+} from "../../store/follow/followSlice";
+import { followApi, unfollowApi } from "../../shared/api/followApi";
 
-  if (week >= 1) return `${week} w`;
-  if (day >= 1) return `${day} d`;
-  if (hr >= 1) return `${hr} h`;
-  if (min >= 1) return `${min} m`;
-  return `${sec} s`;
-};
+const UserPostView = ({ post, onClose }) => {
+  const dispatch = useDispatch();
 
-const PostView = ({ post, onClose }) => {
+  const accessToken = useSelector((s) => s.auth.accessToken);
+  const me = useSelector(selectUser);
+
   const [comment, setComment] = useState("");
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  const owner = post?.owner || null;
-  const username = owner?.username || owner?.email || "username";
-  const avatarSrc = owner?.avatarURL || ProfileImg;
-
-  const created = post?.createdAt || post?.created_at || post?.date || null;
-
-  const caption = post?.caption || "";
-  const comments = Array.isArray(post?.comments) ? post.comments : [];
-
-  const likesCount = Number(post?.likesCount ?? post?.likes?.length ?? 0);
+  const [followBusy, setFollowBusy] = useState(false);
 
   const postId = useMemo(() => safeId(post), [post]);
+
+  const { owner, username, avatarSrc } = getOwnerInfo(post);
+  const { created, caption, comments, likesCount } = getPostMeta(post);
+
+  const ownerId = useMemo(() => String(owner?._id || owner?.id || ""), [owner]);
+  const meId = useMemo(() => String(me?._id || me?.id || ""), [me]);
+
+  const isMe = Boolean(ownerId && meId && ownerId === meId);
+
+  const counts = useSelector(selectFollowCountsByUserId(ownerId));
+  const followed = useSelector(selectIsFollowingByUserId(ownerId));
+
+  useEffect(() => {
+    if (!accessToken || !ownerId) return;
+    dispatch(fetchFollowInfo({ userId: ownerId, accessToken }));
+  }, [dispatch, accessToken, ownerId]);
 
   const onSubmitComment = () => {
     if (!comment.trim()) return;
@@ -53,6 +64,45 @@ const PostView = ({ post, onClose }) => {
     }
   };
 
+  const onToggleFollow = async () => {
+    if (!accessToken || !ownerId || followBusy || isMe) return;
+
+    const prevFollowed = followed;
+    const prevFollowers = Number(counts.followers || 0);
+    const prevFollowing = Number(counts.following || 0);
+
+    setFollowBusy(true);
+
+    dispatch(setIsFollowing({ userId: ownerId, isFollowing: !prevFollowed }));
+    dispatch(
+      setCounts({
+        userId: ownerId,
+        followers: prevFollowed
+          ? Math.max(0, prevFollowers - 1)
+          : prevFollowers + 1,
+        following: prevFollowing,
+      })
+    );
+
+    try {
+      if (prevFollowed) await unfollowApi(ownerId, accessToken);
+      else await followApi(ownerId, accessToken);
+
+      if (meId) dispatch(fetchFollowInfo({ userId: meId, accessToken }));
+    } catch {
+      dispatch(setIsFollowing({ userId: ownerId, isFollowing: prevFollowed }));
+      dispatch(
+        setCounts({
+          userId: ownerId,
+          followers: prevFollowers,
+          following: prevFollowing,
+        })
+      );
+    } finally {
+      setFollowBusy(false);
+    }
+  };
+
   if (!post) return null;
 
   return (
@@ -60,11 +110,6 @@ const PostView = ({ post, onClose }) => {
       <div className={styles.overlay} onClick={onClose}></div>
 
       <div className={styles.popup} onClick={(e) => e.stopPropagation()}>
-        <OptionsMenuModal
-          open={isMenuOpen}
-          onClose={() => setIsMenuOpen(false)}
-        />
-
         <div className={styles.left}>
           <img
             className={styles.photo}
@@ -86,16 +131,18 @@ const PostView = ({ post, onClose }) => {
               </div>
 
               <span className={styles.username}>{username}</span>
-            </div>
 
-            <button
-              type="button"
-              className={styles.moreBtn}
-              onClick={() => setIsMenuOpen(true)}
-              aria-label="More"
-            >
-              …
-            </button>
+              {!isMe && (
+                <button
+                  type="button"
+                  className={styles.followBtn}
+                  onClick={onToggleFollow}
+                  disabled={followBusy}
+                >
+                  {followed ? "Following" : "Follow"}
+                </button>
+              )}
+            </div>
           </div>
 
           <div className={styles.body}>
@@ -117,23 +164,20 @@ const PostView = ({ post, onClose }) => {
 
             <div className={styles.comments}>
               {comments.map((c) => {
-                const cid = c?._id || c?.id || `${postId}-${Math.random()}`;
-                const cu = c?.user || c?.owner || c?.author || {};
-                const cun = cu?.username || cu?.email || "user";
-                const cav = cu?.avatarURL || ProfileImg;
+                const v = getCommentView(c, postId);
 
                 return (
-                  <div key={cid} className={styles.commentRow}>
+                  <div key={v.cid} className={styles.commentRow}>
                     <img
                       className={styles.avatarSmall}
-                      src={cav}
+                      src={v.cav}
                       alt="avatar"
                     />
                     <div className={styles.commentText}>
-                      <span className={styles.usernameInline}>{cun}</span>
-                      <span className={styles.comment}>{c?.text || ""}</span>
+                      <span className={styles.usernameInline}>{v.cun}</span>
+                      <span className={styles.comment}>{v.text}</span>
                       <div className={styles.commentMeta}>
-                        <span>{timeAgo(c?.createdAt)}</span>
+                        <span>{timeAgo(v.createdAt)}</span>
                       </div>
                     </div>
                   </div>
@@ -193,4 +237,4 @@ const PostView = ({ post, onClose }) => {
   );
 };
 
-export default PostView;
+export default UserPostView;

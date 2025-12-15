@@ -13,7 +13,27 @@ import { createConversation } from "../../shared/api/messagesApi";
 import { fetchPostsByUsername } from "../../store/posts/postsSlice";
 import { makeSelectPostsByOwnerKey } from "../../store/posts/postsSelectors";
 
-import PostView from "../../modules/PostView/PostView";
+import UserPostView from "../../modules/UserPostView/UserPostView";
+
+import { followApi, unfollowApi } from "../../shared/api/followApi";
+import {
+  fetchFollowInfo,
+  setCounts,
+  setIsFollowing,
+} from "../../store/follow/followSlice";
+import {
+  selectFollowCountsByUserId,
+  selectIsFollowingByUserId,
+} from "../../store/follow/followSelectors";
+import { selectUser } from "../../store/auth/authSelectors";
+
+import {
+  getSafeUsername,
+  getEntityId,
+  getProfileMeta,
+  resolveProfileStatusFromError,
+  computeNextFollowers,
+} from "../../shared/utils/userProfilePageUtils";
 
 const UserProfilePage = () => {
   const { username } = useParams();
@@ -21,16 +41,14 @@ const UserProfilePage = () => {
   const dispatch = useDispatch();
 
   const accessToken = useSelector((s) => s.auth.accessToken);
+  const me = useSelector(selectUser);
 
   const [profile, setProfile] = useState(null);
   const [status, setStatus] = useState("idle");
-
   const [activePost, setActivePost] = useState(null);
+  const [followBusy, setFollowBusy] = useState(false);
 
-  const safeUsername = useMemo(
-    () => (username ? String(username) : ""),
-    [username]
-  );
+  const safeUsername = useMemo(() => getSafeUsername(username), [username]);
 
   const selectPostsForThisUser = useMemo(
     () => makeSelectPostsByOwnerKey(safeUsername),
@@ -42,10 +60,7 @@ const UserProfilePage = () => {
     if (!safeUsername || !accessToken) return;
 
     let cancelled = false;
-
-    Promise.resolve().then(() => {
-      if (!cancelled) setStatus("loading");
-    });
+    setStatus("loading");
 
     (async () => {
       try {
@@ -53,14 +68,11 @@ const UserProfilePage = () => {
         if (cancelled) return;
         setProfile(data);
         setStatus("success");
-      } catch (e) {
+      } catch (err) {
         if (cancelled) return;
-        if (e?.response?.status === 404) {
-          setProfile(null);
-          setStatus("notfound");
-        } else {
-          setStatus("error");
-        }
+        const nextStatus = resolveProfileStatusFromError(err);
+        if (nextStatus === "notfound") setProfile(null);
+        setStatus(nextStatus);
       }
     })();
 
@@ -73,6 +85,17 @@ const UserProfilePage = () => {
     if (!safeUsername || !accessToken) return;
     dispatch(fetchPostsByUsername(safeUsername));
   }, [dispatch, safeUsername, accessToken]);
+
+  const profileId = getEntityId(profile);
+  const meId = getEntityId(me);
+
+  const counts = useSelector(selectFollowCountsByUserId(profileId));
+  const followed = useSelector(selectIsFollowingByUserId(profileId));
+
+  useEffect(() => {
+    if (!accessToken || !profileId) return;
+    dispatch(fetchFollowInfo({ userId: profileId, accessToken }));
+  }, [dispatch, accessToken, profileId]);
 
   if (status === "loading" || status === "idle") {
     return (
@@ -116,8 +139,7 @@ const UserProfilePage = () => {
     );
   }
 
-  const avatarSrc = profile?.avatarURL || ProfileImg;
-  const website = profile?.website || "";
+  const { avatarSrc, website } = getProfileMeta(profile, ProfileImg);
 
   const onMessage = async () => {
     if (!accessToken || !profile?._id) return;
@@ -128,9 +150,54 @@ const UserProfilePage = () => {
 
       if (cid) navigate(`/messages?cid=${cid}`);
       else navigate("/messages");
-    } catch (e) {
-      console.log("createConversation error:", e);
+    } catch (err) {
+      console.log("createConversation error:", err);
       navigate("/messages");
+    }
+  };
+
+  const onToggleFollow = async () => {
+    if (!accessToken || !profileId || followBusy) return;
+
+    const prevFollowed = followed;
+    const prevFollowers = Number(counts.followers || 0);
+    const prevFollowing = Number(counts.following || 0);
+
+    setFollowBusy(true);
+
+    dispatch(setIsFollowing({ userId: profileId, isFollowing: !prevFollowed }));
+    dispatch(
+      setCounts({
+        userId: profileId,
+        followers: computeNextFollowers(prevFollowed, prevFollowers),
+        following: prevFollowing,
+      })
+    );
+
+    try {
+      if (prevFollowed) {
+        await unfollowApi(profileId, accessToken);
+      } else {
+        await followApi(profileId, accessToken);
+      }
+
+      if (meId) {
+        dispatch(fetchFollowInfo({ userId: meId, accessToken }));
+      }
+    } catch (err) {
+      console.log("follow error:", err);
+      dispatch(
+        setIsFollowing({ userId: profileId, isFollowing: prevFollowed })
+      );
+      dispatch(
+        setCounts({
+          userId: profileId,
+          followers: prevFollowers,
+          following: prevFollowing,
+        })
+      );
+    } finally {
+      setFollowBusy(false);
     }
   };
 
@@ -158,7 +225,15 @@ const UserProfilePage = () => {
                       <h2 className={styles.username}>
                         {profile?.username || profile?.email}
                       </h2>
-                      <button className={styles.follow}>Follow</button>
+
+                      <button
+                        className={styles.follow}
+                        onClick={onToggleFollow}
+                        disabled={followBusy}
+                      >
+                        {followed ? "Following" : "Follow"}
+                      </button>
+
                       <button onClick={onMessage} className={styles.message}>
                         Message
                       </button>
@@ -172,10 +247,16 @@ const UserProfilePage = () => {
                         posts
                       </li>
                       <li>
-                        <span className={styles.statNumber}>0</span> followers
+                        <span className={styles.statNumber}>
+                          {counts.followers}
+                        </span>{" "}
+                        followers
                       </li>
                       <li>
-                        <span className={styles.statNumber}>0</span> following
+                        <span className={styles.statNumber}>
+                          {counts.following}
+                        </span>{" "}
+                        following
                       </li>
                     </ul>
 
@@ -226,7 +307,7 @@ const UserProfilePage = () => {
       <Footer />
 
       {activePost && (
-        <PostView post={activePost} onClose={() => setActivePost(null)} />
+        <UserPostView post={activePost} onClose={() => setActivePost(null)} />
       )}
     </div>
   );
