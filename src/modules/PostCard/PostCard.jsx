@@ -21,6 +21,10 @@ import {
   computeIsSelf,
 } from "../../shared/utils/postCardUtils";
 
+import { likePostApi, unlikePostApi } from "../../shared/api/postsApi";
+
+const toStrId = (x) => String(x?._id || x?.id || x || "");
+
 const PostCard = (props) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -29,6 +33,8 @@ const PostCard = (props) => {
   const me = useSelector(selectUser);
 
   const post = props?.post;
+
+  const postId = useMemo(() => String(post?._id || post?.id || ""), [post]);
 
   const owner = post?.owner || {};
   const ownerId = owner?._id || owner?.id;
@@ -42,25 +48,6 @@ const PostCard = (props) => {
     const t = props.time || post?.createdAt || post?.updatedAt || "";
     return toShortTime(t);
   }, [props.time, post?.createdAt, post?.updatedAt]);
-
-  const [liked, setLiked] = useState(false);
-  const [likes, setLikes] = useState(props.likes || 0);
-
-  const handleLike = (e) => {
-    e?.stopPropagation?.();
-    setLikes((prev) => (liked ? Math.max(0, prev - 1) : prev + 1));
-    setLiked((prev) => !prev);
-  };
-
-  const [isCaptionOpen, setIsCaptionOpen] = useState(false);
-
-  const captionStr = String(caption || "");
-  const isLongCaption = captionStr.length > 30;
-
-  const goToProfile = (e) => {
-    e?.stopPropagation?.();
-    navigate(`/users/${encodeURIComponent(username)}`);
-  };
 
   const meId = getEntityId(me);
 
@@ -87,11 +74,8 @@ const PostCard = (props) => {
     dispatch(setIsFollowing({ userId: ownerId, isFollowing: !prevFollowed }));
 
     try {
-      if (prevFollowed) {
-        await unfollowApi(ownerId, accessToken);
-      } else {
-        await followApi(ownerId, accessToken);
-      }
+      if (prevFollowed) await unfollowApi(ownerId, accessToken);
+      else await followApi(ownerId, accessToken);
 
       dispatch(fetchFollowInfo({ userId: ownerId, accessToken }));
       if (meId) dispatch(fetchFollowInfo({ userId: meId, accessToken }));
@@ -103,8 +87,84 @@ const PostCard = (props) => {
     }
   };
 
+  const calcLikedFromPost = (p) => {
+    if (typeof p?.isLiked === "boolean") return p.isLiked;
+    const likesArr = Array.isArray(p?.likes) ? p.likes : [];
+    return likesArr.some((x) => toStrId(x) === String(meId));
+  };
+
+  const [liked, setLiked] = useState(false);
+  const [likes, setLikes] = useState(0);
+
+  useEffect(() => {
+    setLiked(calcLikedFromPost(post));
+    setLikes(
+      Number(post?.likesCount ?? post?.likes?.length ?? props.likes ?? 0)
+    );
+  }, [post, meId, props.likes]);
+
+  const commentsCount = Number(
+    post?.commentsCount ??
+      (Array.isArray(post?.comments) ? post.comments.length : 0) ??
+      props.commentsCount ??
+      0
+  );
+
+  const handleLike = async (e) => {
+    e?.stopPropagation?.();
+    if (!postId) return;
+
+    const prevLiked = liked;
+    const prevLikes = likes;
+
+    setLiked(!prevLiked);
+    setLikes(prevLiked ? Math.max(0, prevLikes - 1) : prevLikes + 1);
+
+    try {
+      const res = prevLiked
+        ? await unlikePostApi(postId)
+        : await likePostApi(postId);
+
+      const nextLikesCount =
+        typeof res?.likesCount === "number"
+          ? res.likesCount
+          : prevLiked
+          ? Math.max(0, prevLikes - 1)
+          : prevLikes + 1;
+
+      const nextLiked =
+        typeof res?.liked === "boolean" ? res.liked : !prevLiked;
+
+      setLikes(nextLikesCount);
+      setLiked(nextLiked);
+
+      props.onPostUpdated?.(postId, {
+        likesCount: nextLikesCount,
+        isLiked: nextLiked,
+      });
+    } catch (err) {
+      console.log("like error:", err);
+      setLiked(prevLiked);
+      setLikes(prevLikes);
+    }
+  };
+
+  const goToProfile = (e) => {
+    e?.stopPropagation?.();
+    navigate(`/users/${encodeURIComponent(username)}`);
+  };
+
+  const onOpen = () => {
+    props.onOpenPost?.(post);
+  };
+
+  const onOpenWithComment = (e) => {
+    e?.stopPropagation?.();
+    props.onOpenPost?.(post, { focusComment: true });
+  };
+
   return (
-    <div className={`${styles.card} ${isCaptionOpen ? styles.cardOpen : ""}`}>
+    <div className={`${styles.card}`} onClick={onOpen}>
       <div className={styles.header}>
         <img
           className={styles.avatar}
@@ -148,10 +208,7 @@ const PostCard = (props) => {
             <img src={Like} alt="like" />
           </button>
 
-          <button
-            className={styles.iconBtn}
-            onClick={(e) => e.stopPropagation()}
-          >
+          <button className={styles.iconBtn} onClick={onOpenWithComment}>
             <img src={Comment} alt="comment" />
           </button>
         </div>
@@ -159,11 +216,7 @@ const PostCard = (props) => {
 
       <div className={styles.likes}>{likes} likes</div>
 
-      <div
-        className={`${styles.caption} ${
-          isCaptionOpen ? styles.captionOpen : ""
-        }`}
-      >
+      <div className={styles.caption}>
         <span
           className={styles.bold}
           onClick={goToProfile}
@@ -171,27 +224,11 @@ const PostCard = (props) => {
         >
           {username}
         </span>
-        <span className={styles.captionText}>
-          {" "}
-          {isCaptionOpen ? captionStr : captionStr.slice(0, 30)}
-        </span>
-
-        {isLongCaption && !isCaptionOpen && (
-          <button
-            type="button"
-            className={styles.moreBtn}
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsCaptionOpen(true);
-            }}
-          >
-            ...more
-          </button>
-        )}
+        <span className={styles.captionText}> {String(caption || "")}</span>
       </div>
 
-      <div className={styles.comments} onClick={(e) => e.stopPropagation()}>
-        View all comments ({props.commentsCount || 0})
+      <div className={styles.comments} onClick={onOpenWithComment}>
+        View all comments ({commentsCount})
       </div>
     </div>
   );

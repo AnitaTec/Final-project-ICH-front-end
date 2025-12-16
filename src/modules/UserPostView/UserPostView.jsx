@@ -11,6 +11,7 @@ import {
   getOwnerInfo,
   getPostMeta,
   getCommentView,
+  loadPostViewIntoState,
 } from "../../shared/utils/userPostsViewUtils";
 
 import { selectUser } from "../../store/auth/authSelectors";
@@ -24,6 +25,12 @@ import {
   setIsFollowing,
 } from "../../store/follow/followSlice";
 import { followApi, unfollowApi } from "../../shared/api/followApi";
+
+import {
+  likePostApi,
+  unlikePostApi,
+  addCommentApi,
+} from "../../shared/api/postsApi";
 
 const UserPostView = ({ post, onClose }) => {
   const dispatch = useDispatch();
@@ -47,14 +54,65 @@ const UserPostView = ({ post, onClose }) => {
   const counts = useSelector(selectFollowCountsByUserId(ownerId));
   const followed = useSelector(selectIsFollowingByUserId(ownerId));
 
+  const [localComments, setLocalComments] = useState([]);
+  const [localLikes, setLocalLikes] = useState(0);
+  const [liked, setLiked] = useState(false);
+
+  const [commentLikedMap, setCommentLikedMap] = useState({});
+
+  useEffect(() => {
+    setLocalComments(Array.isArray(comments) ? comments : []);
+  }, [comments, postId]);
+
+  useEffect(() => {
+    setLocalLikes(Number(likesCount || 0));
+
+    const likesArr = Array.isArray(post?.likes) ? post.likes : [];
+    const likedByArr = Array.isArray(post?.likedBy) ? post.likedBy : [];
+
+    const hasLike = (arr) =>
+      arr.some((x) => {
+        const id = String(x?._id || x?.id || x || "");
+        return id && meId && id === meId;
+      });
+
+    const initialLiked =
+      Boolean(post?.isLiked) || hasLike(likesArr) || hasLike(likedByArr);
+
+    setLiked(initialLiked);
+  }, [likesCount, post, meId]);
+
+  useEffect(() => {
+    if (!accessToken || !postId) return;
+
+    const cleanup = loadPostViewIntoState({
+      postId,
+      setLocalComments,
+      setLocalLikes,
+      setLiked,
+    });
+
+    return cleanup;
+  }, [accessToken, postId]);
+
   useEffect(() => {
     if (!accessToken || !ownerId) return;
     dispatch(fetchFollowInfo({ userId: ownerId, accessToken }));
   }, [dispatch, accessToken, ownerId]);
 
-  const onSubmitComment = () => {
-    if (!comment.trim()) return;
+  const onSubmitComment = async () => {
+    const text = comment.trim();
+    if (!text || !accessToken || !postId) return;
+
     setComment("");
+
+    try {
+      const res = await addCommentApi(postId, text);
+      const newComment = res?.comment;
+      if (newComment) setLocalComments((prev) => [...prev, newComment]);
+    } catch (e) {
+      console.log("add comment error:", e);
+    }
   };
 
   const onKeyDown = (e) => {
@@ -101,6 +159,33 @@ const UserPostView = ({ post, onClose }) => {
     } finally {
       setFollowBusy(false);
     }
+  };
+
+  const onToggleLike = async () => {
+    if (!accessToken || !postId) return;
+
+    const prevLiked = liked;
+    const prevLikes = localLikes;
+
+    setLiked(!prevLiked);
+    setLocalLikes(prevLiked ? Math.max(0, prevLikes - 1) : prevLikes + 1);
+
+    try {
+      const res = prevLiked
+        ? await unlikePostApi(postId)
+        : await likePostApi(postId);
+      if (typeof res?.likesCount === "number") setLocalLikes(res.likesCount);
+      if (typeof res?.liked === "boolean") setLiked(res.liked);
+    } catch (e) {
+      setLiked(prevLiked);
+      setLocalLikes(prevLikes);
+      console.log("like error:", e);
+    }
+  };
+
+  const onToggleCommentHeart = (cid) => {
+    if (!cid) return;
+    setCommentLikedMap((prev) => ({ ...prev, [cid]: !prev[cid] }));
   };
 
   if (!post) return null;
@@ -163,8 +248,9 @@ const UserPostView = ({ post, onClose }) => {
             </div>
 
             <div className={styles.comments}>
-              {comments.map((c) => {
-                const v = getCommentView(c, postId);
+              {localComments.map((c) => {
+                const v = getCommentView(c, postId, meId, me);
+                const heartOn = Boolean(commentLikedMap[v.cid]);
 
                 return (
                   <div key={v.cid} className={styles.commentRow}>
@@ -173,11 +259,29 @@ const UserPostView = ({ post, onClose }) => {
                       src={v.cav}
                       alt="avatar"
                     />
+
                     <div className={styles.commentText}>
                       <span className={styles.usernameInline}>{v.cun}</span>
                       <span className={styles.comment}>{v.text}</span>
+
                       <div className={styles.commentMeta}>
                         <span>{timeAgo(v.createdAt)}</span>
+
+                        <span
+                          className={styles.commentHeartBtn}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onToggleCommentHeart(v.cid);
+                          }}
+                        >
+                          <img
+                            src={Like}
+                            alt="like"
+                            className={`${styles.commentHeartIcon} ${
+                              heartOn ? styles.commentHeartOn : ""
+                            }`}
+                          />
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -193,6 +297,7 @@ const UserPostView = ({ post, onClose }) => {
                   type="button"
                   className={styles.iconBtn}
                   aria-label="Like"
+                  onClick={onToggleLike}
                 >
                   <img className={styles.actionIcon} src={Like} alt="like" />
                 </button>
@@ -211,7 +316,7 @@ const UserPostView = ({ post, onClose }) => {
               </div>
             </div>
 
-            <div className={styles.likes}>{likesCount} likes</div>
+            <div className={styles.likes}>{localLikes} likes</div>
             <div className={styles.time}>{timeAgo(created)}</div>
 
             <div className={styles.addComment}>

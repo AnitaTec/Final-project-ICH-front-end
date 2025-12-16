@@ -1,4 +1,5 @@
 import ProfileImg from "../../assets/img/Profile.png";
+import { fetchPostViewApi } from "../api/postsApi";
 
 export const safeId = (p) => p?._id || p?.id || p?.postId || p?.uuid || "";
 
@@ -33,13 +34,59 @@ export const getPostMeta = (post) => {
   return { created, caption, comments, likesCount };
 };
 
-export const getCommentView = (c, postId) => {
+const toStrId = (x) => String(x?._id || x?.id || x || "");
+
+export const getCommentView = (c, postId, meId, me) => {
   const cid = c?._id || c?.id || `${postId}-${Math.random()}`;
-  const cu = c?.user || c?.owner || c?.author || {};
-  const cun = cu?.username || cu?.email || "user";
-  const cav = cu?.avatarURL || ProfileImg;
+
+  const rawUser = c?.user || c?.owner || c?.author || null;
+  const userObj = rawUser && typeof rawUser === "object" ? rawUser : null;
+
+  const userId = toStrId(userObj || rawUser);
+  const isMine = Boolean(meId && userId && String(meId) === String(userId));
+
+  const cun =
+    userObj?.username ||
+    userObj?.email ||
+    (isMine ? me?.username || me?.email || "user" : "user");
+
+  const cav =
+    userObj?.avatarURL || (isMine ? me?.avatarURL || ProfileImg : ProfileImg);
+
   const text = c?.text || "";
   const createdAt = c?.createdAt || null;
 
-  return { cid, cun, cav, text, createdAt };
+  return { cid, cun, cav, text, createdAt, userId };
+};
+
+export const loadPostViewIntoState = ({
+  postId,
+  setLocalComments,
+  setLocalLikes,
+  setLiked,
+}) => {
+  let cancelled = false;
+
+  (async () => {
+    try {
+      const data = await fetchPostViewApi(postId);
+      if (cancelled) return;
+
+      const viewComments = Array.isArray(data?.comments) ? data.comments : [];
+      setLocalComments(viewComments);
+
+      const viewLikesCount = Number(
+        data?.likesCount ?? data?.likes?.length ?? 0
+      );
+      setLocalLikes(viewLikesCount);
+
+      if (typeof data?.isLiked === "boolean") setLiked(data.isLiked);
+    } catch (e) {
+      console.log("fetch post view error:", e);
+    }
+  })();
+
+  return () => {
+    cancelled = true;
+  };
 };

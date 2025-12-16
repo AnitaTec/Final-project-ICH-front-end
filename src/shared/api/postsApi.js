@@ -65,9 +65,92 @@ export const fetchFeedPostsApi = async (limit = 24) => {
   return data;
 };
 
+export const fetchPostViewApi = async (postId) => {
+  const { accessToken } = store.getState().auth;
+  if (!accessToken) throw new Error("No accessToken");
+
+  const { data } = await instance.get(`/posts/${postId}/view`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+
+  return data;
+};
+
+export const likePostApi = async (postId) => {
+  const { accessToken } = store.getState().auth;
+  if (!accessToken) throw new Error("No accessToken");
+
+  const { data } = await instance.post(
+    `/posts/${postId}/like`,
+    {},
+    { headers: { Authorization: `Bearer ${accessToken}` } }
+  );
+
+  return data;
+};
+
+export const unlikePostApi = async (postId) => {
+  const { accessToken } = store.getState().auth;
+  if (!accessToken) throw new Error("No accessToken");
+
+  const { data } = await instance.post(
+    `/posts/${postId}/unlike`,
+    {},
+    { headers: { Authorization: `Bearer ${accessToken}` } }
+  );
+
+  return data;
+};
+
+export const addCommentApi = async (postId, text) => {
+  const { accessToken } = store.getState().auth;
+  if (!accessToken) throw new Error("No accessToken");
+
+  const { data } = await instance.post(
+    `/posts/${postId}/comments`,
+    { text },
+    { headers: { Authorization: `Bearer ${accessToken}` } }
+  );
+
+  return data;
+};
+
+export const likeCommentApi = async (postId, commentId) => {
+  const { accessToken } = store.getState().auth;
+  if (!accessToken) throw new Error("No accessToken");
+
+  const { data } = await instance.post(
+    `/posts/${postId}/comments/${commentId}/like`,
+    {},
+    { headers: { Authorization: `Bearer ${accessToken}` } }
+  );
+
+  return data;
+};
+
+export const unlikeCommentApi = async (postId, commentId) => {
+  const { accessToken } = store.getState().auth;
+  if (!accessToken) throw new Error("No accessToken");
+
+  const { data } = await instance.post(
+    `/posts/${postId}/comments/${commentId}/unlike`,
+    {},
+    { headers: { Authorization: `Bearer ${accessToken}` } }
+  );
+
+  return data;
+};
+
 export const createPost = createPostApi;
 export const fetchMyPosts = fetchMyPostsApi;
 export const fetchPostsByUsername = fetchPostsByUsernameApi;
 export const fetchExplorePosts = fetchExplorePostsApi;
 export const fetchFeedPosts = fetchFeedPostsApi;
 export const deletePost = deletePostApi;
+
+export const fetchPostView = fetchPostViewApi;
+export const likePost = likePostApi;
+export const unlikePost = unlikePostApi;
+export const addComment = addCommentApi;
+export const likeComment = likeCommentApi;
+export const unlikeComment = unlikeCommentApi;

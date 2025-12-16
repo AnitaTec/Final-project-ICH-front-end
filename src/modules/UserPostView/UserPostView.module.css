@@ -158,6 +158,8 @@
 .commentRow {
   display: flex;
   gap: 10px;
+  position: relative;
+  padding-right: 26px;
 }
 
 .commentText {
@@ -259,4 +261,27 @@
 .postBtn:disabled {
   opacity: 0.4;
   cursor: default;
+}
+
+.commentHeartBtn {
+  position: absolute;
+  right: 0;
+  top: 8px;
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.commentHeartIcon {
+  width: 14px;
+  height: 14px;
+  display: block;
+}
+
+.commentHeartOn {
+  filter: brightness(0) saturate(100%) invert(22%) sepia(96%) saturate(6500%)
+    hue-rotate(353deg) brightness(102%) contrast(116%);
 }
