@@ -1,6 +1,13 @@
 import styles from "./OptionsMenuModal.module.css";
 
-const OptionsMenuModal = ({ open, onClose }) => {
+const OptionsMenuModal = ({
+  open,
+  onClose,
+  onDelete,
+  onCopyLink,
+  onGoToPost,
+  onEdit,
+}) => {
   if (!open) return null;
 
   return (
@@ -11,20 +18,32 @@ const OptionsMenuModal = ({ open, onClose }) => {
         <button
           type="button"
           className={`${styles.item} ${styles.delete}`}
-          onClick={onClose}
+          onClick={onDelete || onClose}
         >
           Delete
         </button>
 
-        <button type="button" className={styles.item} onClick={onClose}>
+        <button
+          type="button"
+          className={styles.item}
+          onClick={onEdit || onClose}
+        >
           Edit
         </button>
 
-        <button type="button" className={styles.item} onClick={onClose}>
+        <button
+          type="button"
+          className={styles.item}
+          onClick={onGoToPost || onClose}
+        >
           Go to post
         </button>
 
-        <button type="button" className={styles.item} onClick={onClose}>
+        <button
+          type="button"
+          className={styles.item}
+          onClick={onCopyLink || onClose}
+        >
           Copy link
         </button>
 

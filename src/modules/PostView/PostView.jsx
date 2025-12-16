@@ -1,10 +1,15 @@
 import { useMemo, useState } from "react";
+import { useDispatch } from "react-redux";
+
 import styles from "./PostView.module.css";
 import ProfileImg from "../../assets/img/Profile.png";
 import Like from "../../assets/icons/Like.svg";
 import Comment from "../../assets/icons/Coment.svg";
 import Frame from "../../assets/icons/frame.png";
 import OptionsMenuModal from "../OptionsMenu/OptionsMenuModal";
+
+import { fetchMyPosts } from "../../store/posts/postsSlice";
+import { deletePostApi } from "../../shared/api/postsApi";
 
 const safeId = (p) => p?._id || p?.id || p?.postId || p?.uuid || "";
 
@@ -25,6 +30,8 @@ const timeAgo = (iso) => {
 };
 
 const PostView = ({ post, onClose }) => {
+  const dispatch = useDispatch();
+
   const [comment, setComment] = useState("");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -53,6 +60,41 @@ const PostView = ({ post, onClose }) => {
     }
   };
 
+  const onCopyLink = async () => {
+    const url = `${window.location.origin}/post/${postId}`;
+
+    try {
+      await navigator.clipboard.writeText(url);
+    } catch {
+      const ta = document.createElement("textarea");
+      ta.value = url;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+    } finally {
+      setIsMenuOpen(false);
+    }
+  };
+
+  const onGoToPost = () => {
+    setIsMenuOpen(false);
+    onClose();
+  };
+
+  const onDelete = async () => {
+    if (!postId) return;
+
+    try {
+      await deletePostApi(postId);
+      setIsMenuOpen(false);
+      onClose();
+      dispatch(fetchMyPosts());
+    } catch {
+      setIsMenuOpen(false);
+    }
+  };
+
   if (!post) return null;
 
   return (
@@ -63,6 +105,10 @@ const PostView = ({ post, onClose }) => {
         <OptionsMenuModal
           open={isMenuOpen}
           onClose={() => setIsMenuOpen(false)}
+          onDelete={onDelete}
+          onCopyLink={onCopyLink}
+          onGoToPost={onGoToPost}
+          onEdit={() => setIsMenuOpen(false)}
         />
 
         <div className={styles.left}>

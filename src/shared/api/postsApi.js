@@ -25,6 +25,17 @@ export const fetchMyPostsApi = async () => {
   return data;
 };
 
+export const deletePostApi = async (postId) => {
+  const { accessToken } = store.getState().auth;
+  if (!accessToken) throw new Error("No accessToken");
+
+  const { data } = await instance.delete(`/posts/${postId}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+
+  return data;
+};
+
 export const fetchPostsByUsernameApi = async (username) => {
   const { accessToken } = store.getState().auth;
   if (!accessToken) throw new Error("No accessToken");
@@ -59,3 +70,4 @@ export const fetchMyPosts = fetchMyPostsApi;
 export const fetchPostsByUsername = fetchPostsByUsernameApi;
 export const fetchExplorePosts = fetchExplorePostsApi;
 export const fetchFeedPosts = fetchFeedPostsApi;
+export const deletePost = deletePostApi;
