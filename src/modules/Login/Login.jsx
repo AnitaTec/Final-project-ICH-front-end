@@ -14,7 +14,7 @@ const Login = () => {
   return (
     <div>
       <LoginForm requestErrors={error} submitForm={onLogin} />
-      {loading && <p>Register request .....</p>}
+      {loading && <p>Login request .....</p>}
     </div>
   );
 };
