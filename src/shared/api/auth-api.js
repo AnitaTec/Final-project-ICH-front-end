@@ -76,3 +76,16 @@ export const searchUsers = async (q) => {
 
   return data;
 };
+
+export const resetPasswordRequest = async (identifier) => {
+  const { data } = await instance.post("/auth/reset/request", { identifier });
+  return data;
+};
+
+export const resetPasswordConfirm = async ({ token, password }) => {
+  const { data } = await instance.post("/auth/reset/confirm", {
+    token,
+    password,
+  });
+  return data;
+};
